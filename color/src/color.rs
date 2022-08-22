@@ -1,8 +1,15 @@
+use std::fmt::{Display, Formatter};
 use apolaki_tuple::Tuple;
 use std::ops::{Add, Mul, Sub};
 
 #[derive(Copy, Clone, Debug)]
 pub struct Color(Tuple);
+
+impl Display for Color {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("Color {} {} {}", self.r(), self.g(), self.b()))
+    }
+}
 
 impl Default for Color {
     // default to white
@@ -51,6 +58,7 @@ impl Add<Self> for Color {
     fn add(self, rhs: Color) -> Self::Output {
         Self(self.0 + rhs.0)
     }
+
 }
 
 impl Sub<Self> for Color {
