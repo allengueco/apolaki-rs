@@ -1,5 +1,5 @@
-use std::fmt::{Display, Formatter};
 use apolaki_tuple::Tuple;
+use std::fmt::{Display, Formatter};
 use std::ops::{Add, Mul, Sub};
 
 #[derive(Copy, Clone, Debug)]
@@ -33,6 +33,17 @@ impl Color {
     pub fn b(self) -> f64 {
         self.0.z()
     }
+
+    #[inline]
+    pub fn to_ppm_color(&self) -> String {
+        // Don't know if lerp-ing refers to this
+        fn lerp(n: f64) -> u8 {
+            (n.clamp(0., 0.999) * 256.) as u8
+        }
+        let [r, g, b] = [lerp(self.r()), lerp(self.g()), lerp(self.b())];
+
+        return format!("{} {} {}", r, g, b);
+    }
 }
 
 impl PartialEq for Color {
@@ -58,7 +69,6 @@ impl Add<Self> for Color {
     fn add(self, rhs: Color) -> Self::Output {
         Self(self.0 + rhs.0)
     }
-
 }
 
 impl Sub<Self> for Color {

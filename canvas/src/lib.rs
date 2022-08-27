@@ -6,9 +6,9 @@ pub use canvas::Canvas;
 
 #[cfg(test)]
 mod tests {
-    use apolaki_color::Color;
-    use crate::Canvas;
     use crate::canvas::PixelIndex;
+    use crate::Canvas;
+    use apolaki_color::Color;
 
     #[test]
     fn creating_a_canvas() {
@@ -29,8 +29,21 @@ mod tests {
         dbg!(&c);
         c.write(2, 3, red);
 
-
-
         assert_eq!(red, c[PixelIndex(2, 3)])
+    }
+
+    #[test]
+    fn constructing_the_ppm_header() {
+        let c = Canvas::with_size(5, 3);
+        let ppm_header = c.ppm_header();
+
+        assert_eq!(
+            r"
+        P3
+        5 3
+        255
+        ",
+            ppm_header
+        )
     }
 }
