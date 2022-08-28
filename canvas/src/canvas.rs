@@ -15,7 +15,15 @@ impl Canvas {
         Self {
             width,
             height,
-            pixels: vec![vec![Color::default(); height]; width],
+            pixels: vec![vec![Color::default(); width]; height],
+        }
+    }
+
+    pub fn with_default_color(&mut self, default_color: Color) -> Self {
+        Self {
+            width: self.width,
+            height: self.height,
+            pixels: vec![vec![default_color; self.width]; self.height],
         }
     }
 
@@ -24,7 +32,7 @@ impl Canvas {
     }
 
     pub fn to_ppm_string(&self) -> String {
-        todo!()
+        self.ppm_header() + self.ppm_body().as_str()
     }
 
     pub fn ppm_header(&self) -> String {
@@ -32,32 +40,36 @@ impl Canvas {
     }
 
     pub fn ppm_body(&self) -> String {
-        const MAX_LENGTH: usize = 70;
-        let ppm_strings: Vec<&str> = self
+        let ppm_strings: Vec<Vec<String>> = self
             .pixels
             .iter()
-            .flatten()
-            .flat_map(|c| c.to_ppm_color().split(" "))
+            .map(|ps| ps.iter().map(|c| c.to_ppm_color()).collect())
             .collect();
 
         let mut acc = String::new();
-        let mut current_line_length: usize = 0;
 
-        for ppm_str in ppm_strings {
-            acc.push_str(ppm_str.clone());
+        for pixel_row in ppm_strings {
+            let mut res = String::new();
+            let mut index = 70; // max line length
+            let mut chars = pixel_row.join(" ");
 
-            match current_line_length {
-                0..=68 => {
-                    acc.push(' ');
-                    current_line_length = acc.len()
+            // we try to find the character which is at an index of a multiple of 70 (the max range)
+            while let Some(char) = chars.chars().nth(index) {
+                match char {
+                    ' ' => chars.replace_range(index..index + 1, "\n"),
+                    _ => {
+                        if let Some(idx) = chars[index - 70..index].rfind(' ') {
+                            chars.replace_range(idx..idx + 1, "\n")
+                        }
+                    }
                 }
-                _ => {
-                    acc.push('\n');
-                    current_line_length = 0
-                }
+                index += 70;
             }
-        }
 
+            res.push_str(chars.as_str());
+            res += "\n";
+            acc.push_str(&res);
+        }
         acc
     }
 }
