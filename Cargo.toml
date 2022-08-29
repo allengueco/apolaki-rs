@@ -3,5 +3,6 @@
 members = [
     "canvas",
     "tuple",
-    "color"
+    "color",
+    "matrix",
 ]
