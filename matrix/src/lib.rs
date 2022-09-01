@@ -1,12 +1,25 @@
 mod matrix {
     use apolaki_tuple::Tuple;
-    use std::ops::{Index, IndexMut, Mul};
+    use core::array::from_fn;
+    use std::ops::{Index, IndexMut, Mul, Range};
+    use thiserror::Error;
 
     // MxN = RxC
     #[derive(Debug, PartialEq, Copy, Clone)]
     pub struct BaseMatrix<const M: usize, const N: usize> {
         matrix: [[f64; N]; M],
     }
+
+    // Do I even need this
+    #[derive(Error, Debug)]
+    pub enum MatrixError {
+        #[error("invalid operation: {reason:?}")]
+        InvalidOperationError { reason: String },
+
+        #[error("out of bounds: idx = {idx} on range {limit:?}")]
+        IndexOutOfBoundsError { limit: Range<usize>, idx: usize },
+    }
+
     impl<const M: usize, const N: usize> BaseMatrix<M, N> {
         pub fn new<T: Into<f64>>(elem: T) -> Self {
             Self {
@@ -34,6 +47,31 @@ mod matrix {
                 })
             });
             m
+        }
+    }
+
+    pub trait Submatrix<const M: usize, const N: usize> {
+        fn submatrix(&self, r: usize, c: usize) -> Result<BaseMatrix<M, N>, MatrixError>;
+    }
+
+    impl Submatrix<3, 3> for Matrix4x4 {
+        fn submatrix(&self, r: usize, c: usize) -> Result<BaseMatrix<3, 3>, MatrixError> {
+            todo!()
+        }
+    }
+
+    impl Submatrix<2, 2> for Matrix3x3 {
+        fn submatrix(&self, r: usize, c: usize) -> Result<BaseMatrix<2, 2>, MatrixError> {
+            let mut b = [[0.0; 2]; 2];
+            Ok(Matrix2x2::from(b))
+        }
+    }
+
+    impl Submatrix<1, 1> for Matrix2x2 {
+        fn submatrix(&self, r: usize, c: usize) -> Result<BaseMatrix<1, 1>, MatrixError> {
+            Err(MatrixError::InvalidOperationError {
+                reason: "cannot get submatrix of size 3x3".to_string(),
+            })
         }
     }
 
@@ -85,7 +123,6 @@ mod matrix {
         }
     }
 
-    use core::array::from_fn;
     impl Mul<Tuple> for BaseMatrix<4, 4> {
         type Output = Tuple;
 
