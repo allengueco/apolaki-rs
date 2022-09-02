@@ -62,7 +62,7 @@ mod matrix {
 
     impl Submatrix<2, 2> for Matrix3x3 {
         fn submatrix(&self, r: usize, c: usize) -> Result<BaseMatrix<2, 2>, MatrixError> {
-            let mut b = [[0.0; 2]; 2];
+            let mut b = [[1.0; 2]; 2];
             Ok(Matrix2x2::from(b))
         }
     }
