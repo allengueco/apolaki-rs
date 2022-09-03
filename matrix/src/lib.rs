@@ -53,7 +53,6 @@ mod tests {
     mod ops {
         use super::*;
         use apolaki_tuple::Tuple;
-        use std::process::id;
 
         #[test]
         fn matrix_eq_with_identical_matrices() {
@@ -171,6 +170,62 @@ mod tests {
             let identity = Matrix4x4::identity();
 
             assert_eq!(identity, identity.transpose());
+        }
+
+        #[test]
+        fn calculating_the_determinant_of_2x2() {
+            let a = matrix! {
+                1 5;
+                -3 2;
+            };
+            assert_eq!(17., a.determinant());
+        }
+
+        #[test]
+        fn submatrix_of_3x3_is_2x2() {
+            let a = matrix! {
+                1 5 0;
+                -3 2 7;
+                0 6 -3;
+            };
+
+            let expected = matrix! {
+                -3 2;
+                0 6;
+            };
+
+            assert_eq!(expected, a.submatrix(0, 2));
+        }
+
+        #[test]
+        fn submatrix_of_4x4_is_3x3() {
+            let a = matrix! {
+                -6 1 1 6;
+                -8 5 8 6;
+                -1 0 8 2;
+                -7 1 -1 1;
+            };
+
+            let expected = matrix! {
+                -6 1 6;
+                -8 8 6;
+                -7 -1 1;
+            };
+
+            assert_eq!(expected, a.submatrix(2, 1));
+        }
+
+        #[test]
+        fn calculating_minor_of_3x3() {
+            let a: Matrix3x3 = matrix! {
+                3 5 0;
+                2 -1 -7;
+                6 -1 5;
+            };
+
+            let b: Matrix2x2 = a.submatrix(1, 0);
+            assert_eq!(b.determinant(), 25.);
+            assert_eq!(a.minor::<2, 2>(1, 0), 25.);
         }
     }
 }

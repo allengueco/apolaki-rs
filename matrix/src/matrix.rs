@@ -10,7 +10,7 @@ pub struct BaseMatrix<const M: usize, const N: usize> {
 }
 
 // Do I even need this
-#[derive(Error, Debug)]
+#[derive(Error, Debug, PartialEq)]
 pub enum MatrixError {
     #[error("invalid operation: {reason:?}")]
     InvalidOperationError { reason: String },
@@ -47,30 +47,45 @@ impl<const M: usize, const N: usize> BaseMatrix<M, N> {
         });
         m
     }
-}
 
-pub trait Submatrix<const M: usize, const N: usize> {
-    fn submatrix(&self, r: usize, c: usize) -> Result<BaseMatrix<M, N>, MatrixError>;
-}
-
-impl Submatrix<3, 3> for Matrix4x4 {
-    fn submatrix(&self, r: usize, c: usize) -> Result<BaseMatrix<3, 3>, MatrixError> {
-        todo!()
+    pub fn submatrix<const O: usize, const P: usize>(
+        &self,
+        r: usize,
+        c: usize,
+    ) -> BaseMatrix<O, P> {
+        fn remove<const O: usize, const P: usize>(
+            matrix: &[[f64; P]; O],
+            r: usize,
+            c: usize,
+        ) -> Vec<Vec<f64>> {
+            let (left, right) = matrix.split_at(r);
+            let split_rows = [left, &right[1..]].concat(); // removed row at `r`
+            split_rows
+                .iter()
+                .map(|row| {
+                    let (left, right) = row.split_at(c); // remove elem at 'c' from each row
+                    [left, &right[1..]].concat()
+                })
+                .collect()
+        }
+        let mut b = [[0.0; P]; O];
+        let vec = remove(&self.matrix, r, c);
+        for (r1, r2) in b.iter_mut().zip(vec.iter()) {
+            r1.copy_from_slice(r2.as_slice());
+        }
+        BaseMatrix::<O, P>::from(b)
     }
-}
 
-impl Submatrix<2, 2> for Matrix3x3 {
-    fn submatrix(&self, r: usize, c: usize) -> Result<BaseMatrix<2, 2>, MatrixError> {
-        let mut b = [[1.0; 2]; 2];
-        Ok(Matrix2x2::from(b))
+    pub fn determinant(&self) -> f64 {
+        if M == 2 && N == 2 {
+            self.matrix[0][0] * self.matrix[1][1] - self.matrix[0][1] * self.matrix[1][0]
+        } else {
+            1.0
+        }
     }
-}
 
-impl Submatrix<1, 1> for Matrix2x2 {
-    fn submatrix(&self, r: usize, c: usize) -> Result<BaseMatrix<1, 1>, MatrixError> {
-        Err(MatrixError::InvalidOperationError {
-            reason: "cannot get submatrix of size 3x3".to_string(),
-        })
+    pub fn minor<const O: usize, const P: usize>(&self, r: usize, c: usize) -> f64 {
+        self.submatrix::<O, P>(r, c).determinant()
     }
 }
 
