@@ -1,3 +1,4 @@
+#![feature(generic_const_exprs)]
 mod matrix;
 
 use matrix::*;
@@ -25,7 +26,7 @@ mod tests {
 
     #[test]
     fn a_2x2_matrix_ought_to_be_representable() {
-        let m: BaseMatrix<2, 2> = matrix! {
+        let m = matrix! {
             -3 5;
             1 -2;
         };
@@ -223,9 +224,37 @@ mod tests {
                 6 -1 5;
             };
 
-            let b: Matrix2x2 = a.submatrix(1, 0);
+            let b = a.submatrix(1, 0);
             assert_eq!(b.determinant(), 25.);
-            assert_eq!(a.minor::<2, 2>(1, 0), 25.);
+            assert_eq!(a.minor(1, 0), 25.);
+        }
+
+        #[test]
+        fn calculating_cofactor_of_3x3() {
+            let a = matrix! {
+                3 5 0;
+                2 -1 -7;
+                6 -1 5;
+            };
+
+            assert_eq!(-12., a.minor(0, 0));
+            assert_eq!(-12., a.cofactor(0, 0));
+            assert_eq!(25., a.minor(1, 0));
+            assert_eq!(-25., a.cofactor(1, 0));
+        }
+
+        #[test]
+        fn calculating_determinant_of_3x3() {
+            let a = matrix! {
+                1 2 6;
+                -5 8 -4;
+                2 6 4;
+            };
+
+            assert_eq!(56., a.cofactor(0, 0));
+            assert_eq!(12., a.cofactor(0, 1));
+            assert_eq!(-46., a.cofactor(0, 2));
+            assert_eq!(-196., a.determinant());
         }
     }
 }

@@ -1,34 +1,23 @@
 use apolaki_tuple::Tuple;
 use core::array::from_fn;
-use std::ops::{Index, IndexMut, Mul, Range};
-use thiserror::Error;
+use std::ops::{Index, IndexMut, Mul};
 
 // MxN = RxC
 #[derive(Debug, PartialEq, Copy, Clone)]
-pub struct BaseMatrix<const M: usize, const N: usize> {
-    matrix: [[f64; N]; M],
+pub struct BaseMatrix<const N: usize> {
+    matrix: [[f64; N]; N],
 }
 
-// Do I even need this
-#[derive(Error, Debug, PartialEq)]
-pub enum MatrixError {
-    #[error("invalid operation: {reason:?}")]
-    InvalidOperationError { reason: String },
-
-    #[error("out of bounds: idx = {idx} on range {limit:?}")]
-    IndexOutOfBoundsError { limit: Range<usize>, idx: usize },
-}
-
-impl<const M: usize, const N: usize> BaseMatrix<M, N> {
+impl<const N: usize> BaseMatrix<N> {
     pub fn new<T: Into<f64>>(elem: T) -> Self {
         Self {
-            matrix: [[elem.into(); N]; M],
+            matrix: [[elem.into(); N]; N],
         }
     }
 
     pub fn identity() -> Self {
-        let mut init = [[0.0; N]; M];
-        (0..M).into_iter().for_each(|r| {
+        let mut init = [[0.0; N]; N];
+        (0..N).into_iter().for_each(|r| {
             (0..N).into_iter().for_each(|c| {
                 if r == c {
                     init[r][c] = 1.0
@@ -40,7 +29,7 @@ impl<const M: usize, const N: usize> BaseMatrix<M, N> {
 
     pub fn transpose(&self) -> Self {
         let mut m = self.clone();
-        (0..M).into_iter().for_each(|r| {
+        (0..N).into_iter().for_each(|r| {
             (0..N).into_iter().for_each(|c| {
                 m[r][c] = self[c][r];
             })
@@ -48,11 +37,13 @@ impl<const M: usize, const N: usize> BaseMatrix<M, N> {
         m
     }
 
-    pub fn submatrix<const O: usize, const P: usize>(
-        &self,
-        r: usize,
-        c: usize,
-    ) -> BaseMatrix<O, P> {
+    // Since I can't generically declare a method which returns a BaseMatrix<M-1, N-1> (const
+    // generic expr not implemented) yet
+    // https://doc.rust-lang.org/unstable-book/language-features/generic-const-exprs.html
+    pub fn submatrix(&self, r: usize, c: usize) -> BaseMatrix<{ N - 1 }>
+    where
+        [(); N - 1]:,
+    {
         fn remove<const O: usize, const P: usize>(
             matrix: &[[f64; P]; O],
             r: usize,
@@ -68,45 +59,63 @@ impl<const M: usize, const N: usize> BaseMatrix<M, N> {
                 })
                 .collect()
         }
-        let mut b = [[0.0; P]; O];
+        let mut b = [[0.0; N - 1]; N - 1];
         let vec = remove(&self.matrix, r, c);
         for (r1, r2) in b.iter_mut().zip(vec.iter()) {
             r1.copy_from_slice(r2.as_slice());
         }
-        BaseMatrix::<O, P>::from(b)
+        BaseMatrix::<{ N - 1 }>::from(b)
     }
 
     pub fn determinant(&self) -> f64 {
-        if M == 2 && N == 2 {
+        if N == 2 {
             self.matrix[0][0] * self.matrix[1][1] - self.matrix[0][1] * self.matrix[1][0]
         } else {
             1.0
+            // self[0]
+            //     .iter()
+            //     .enumerate()
+            //     .map(|(i, e)| e * self.cofactor(0, i))
+            //     .sum()
         }
     }
 
-    pub fn minor<const O: usize, const P: usize>(&self, r: usize, c: usize) -> f64 {
-        self.submatrix::<O, P>(r, c).determinant()
+    pub fn minor(&self, r: usize, c: usize) -> f64
+    where
+        [(); N - 1]:,
+    {
+        self.submatrix(r, c).determinant()
+    }
+
+    pub fn cofactor(&self, r: usize, c: usize) -> f64
+    where
+        [(); N - 1]:,
+    {
+        if (r + c) % 2 == 0 {
+            self.minor(r, c)
+        } else {
+            -self.minor(r, c)
+        }
     }
 }
 
-impl<const M: usize, const N: usize> Default for BaseMatrix<M, N> {
+impl<const N: usize> Default for BaseMatrix<N> {
     fn default() -> Self {
         BaseMatrix::new(0)
     }
 }
 
-type SquareMatrix<const N: usize> = BaseMatrix<N, N>;
-pub type Matrix2x2 = SquareMatrix<2>;
-pub type Matrix3x3 = SquareMatrix<3>;
-pub type Matrix4x4 = SquareMatrix<4>;
+pub type Matrix2x2 = BaseMatrix<2>;
+pub type Matrix3x3 = BaseMatrix<3>;
+pub type Matrix4x4 = BaseMatrix<4>;
 
-impl<const M: usize, const N: usize> From<[[f64; N]; M]> for BaseMatrix<M, N> {
-    fn from(matrix: [[f64; N]; M]) -> Self {
+impl<const N: usize> From<[[f64; N]; N]> for BaseMatrix<N> {
+    fn from(matrix: [[f64; N]; N]) -> Self {
         Self { matrix }
     }
 }
 
-impl<const M: usize, const N: usize> Index<usize> for BaseMatrix<M, N> {
+impl<const N: usize> Index<usize> for BaseMatrix<N> {
     type Output = [f64; N];
 
     fn index(&self, index: usize) -> &Self::Output {
@@ -114,18 +123,18 @@ impl<const M: usize, const N: usize> Index<usize> for BaseMatrix<M, N> {
     }
 }
 
-impl<const M: usize, const N: usize> IndexMut<usize> for BaseMatrix<M, N> {
+impl<const N: usize> IndexMut<usize> for BaseMatrix<N> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         self.matrix.index_mut(index)
     }
 }
 
-impl<const M: usize, const N: usize> Mul<BaseMatrix<M, N>> for BaseMatrix<M, N> {
+impl<const N: usize> Mul<BaseMatrix<N>> for BaseMatrix<N> {
     type Output = Self;
 
-    fn mul(self, rhs: BaseMatrix<M, N>) -> Self::Output {
+    fn mul(self, rhs: BaseMatrix<N>) -> Self::Output {
         let mut m = Self::new(0.0);
-        for r in 0..M {
+        for r in 0..N {
             for c in 0..N {
                 m[r][c] = self[r][0] * rhs[0][c]
                     + self[r][1] * rhs[1][c]
@@ -137,7 +146,7 @@ impl<const M: usize, const N: usize> Mul<BaseMatrix<M, N>> for BaseMatrix<M, N> 
     }
 }
 
-impl Mul<Tuple> for BaseMatrix<4, 4> {
+impl Mul<Tuple> for BaseMatrix<4> {
     type Output = Tuple;
 
     fn mul(self, rhs: Tuple) -> Self::Output {
