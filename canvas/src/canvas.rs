@@ -53,10 +53,13 @@ impl Canvas {
             let mut index = 70; // max line length
             let mut chars = pixel_row.join(" ");
 
-            // we try to find the character which is at an index of a multiple of 70 (the max range)
+            // we try to find the character at an index of a multiple of 70 (the max line length)
             while let Some(char) = chars.chars().nth(index) {
                 match char {
+                    // if it's a blank space already, replace with newline
                     ' ' => chars.replace_range(index..index + 1, "\n"),
+
+                    // if not, we find the last blank space from the right.
                     _ => {
                         if let Some(idx) = chars[index - 70..index].rfind(' ') {
                             chars.replace_range(idx..idx + 1, "\n")
@@ -67,6 +70,7 @@ impl Canvas {
             }
 
             res.push_str(chars.as_str());
+            // when the line ends, just add a newline char
             res += "\n";
             acc.push_str(&res);
         }
