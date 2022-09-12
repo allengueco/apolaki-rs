@@ -37,6 +37,7 @@ impl<const N: usize> BaseMatrix<N> {
         m
     }
 
+    // Relying on #![feature(generic_const_exprs)]
     // Since I can't generically declare a method which returns a BaseMatrix<M-1, N-1> (const
     // generic expr not implemented) yet
     // https://doc.rust-lang.org/unstable-book/language-features/generic-const-exprs.html
@@ -67,24 +68,24 @@ impl<const N: usize> BaseMatrix<N> {
         BaseMatrix::<{ N - 1 }>::from(b)
     }
 
-    pub fn determinant(&self) -> f64 {
+    pub fn determinant(&self) -> f64
+        where [(); N - 1]: Sized,
+    {
         if N == 2 {
             self.matrix[0][0] * self.matrix[1][1] - self.matrix[0][1] * self.matrix[1][0]
         } else {
-            1.0
-            // self[0]
-            //     .iter()
-            //     .enumerate()
-            //     .map(|(i, e)| e * self.cofactor(0, i))
-            //     .sum()
+            self[0]
+                .iter()
+                .enumerate()
+                .map(|(i, e)| e * self.cofactor(0, i))
+                .sum()
         }
     }
 
     pub fn minor(&self, r: usize, c: usize) -> f64
-    where
-        [(); N - 1]:,
     {
-        self.submatrix(r, c).determinant()
+        let submatrix: BaseMatrix<{N - 1}> = self.submatrix(r, c);
+        submatrix.determinant()
     }
 
     pub fn cofactor(&self, r: usize, c: usize) -> f64
