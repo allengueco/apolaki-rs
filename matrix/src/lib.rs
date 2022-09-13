@@ -1,7 +1,6 @@
-#![feature(generic_const_exprs)]
 mod matrix;
 
-use matrix::*;
+pub use matrix::*;
 
 #[cfg(test)]
 mod tests {

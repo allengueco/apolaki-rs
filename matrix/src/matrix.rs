@@ -7,6 +7,125 @@ use std::ops::{Index, IndexMut, Mul};
 pub struct BaseMatrix<const N: usize> {
     matrix: [[f64; N]; N],
 }
+// methods which require taking a submatrix
+pub trait Submatrix<const N: usize> {
+    fn submatrix(&self, r: usize, c: usize) -> BaseMatrix<N>;
+    fn minor(&self, r: usize, c: usize) -> f64;
+    fn determinant(&self) -> f64;
+    fn cofactor(&self, r: usize, c: usize) -> f64;
+    fn remove<const O: usize, const P: usize>(
+        matrix: &[[f64; P]; O],
+        r: usize,
+        c: usize,
+    ) -> Vec<Vec<f64>> {
+        let (left, right) = matrix.split_at(r);
+        let split_rows = [left, &right[1..]].concat(); // removed row at `r`
+        split_rows
+            .iter()
+            .map(|row| {
+                let (left, right) = row.split_at(c); // remove elem at 'c' from each row
+                [left, &right[1..]].concat()
+            })
+            .collect()
+    }
+}
+
+impl Submatrix<0> for BaseMatrix<1> {
+    #[inline(always)]
+    fn submatrix(&self, _r: usize, _c: usize) -> BaseMatrix<0> {
+        [].into()
+    }
+
+    #[inline(always)]
+    fn minor(&self, _r: usize, _c: usize) -> f64 {
+        self.determinant()
+    }
+
+    #[inline(always)]
+    fn determinant(&self) -> f64 {
+        self[0][0]
+    }
+
+    #[inline(always)]
+    fn cofactor(&self, _r: usize, _c: usize) -> f64 {
+        self[0][0]
+    }
+}
+
+impl Submatrix<1> for BaseMatrix<2> {
+    #[inline(always)]
+    fn submatrix(&self, r: usize, c: usize) -> BaseMatrix<1> {
+        let mut b = [[0.0; 1]; 1];
+        let vec = Self::remove(&self.matrix, r, c);
+        for (r1, r2) in b.iter_mut().zip(vec.iter()) {
+            r1.copy_from_slice(r2.as_slice());
+        }
+        BaseMatrix::from(b)
+    }
+
+    #[inline(always)]
+    fn minor(&self, r: usize, c: usize) -> f64 {
+        self.submatrix(r, c).determinant()
+    }
+
+    #[inline(always)]
+    fn determinant(&self) -> f64 {
+        self[0][0] * self[1][1] - self[0][1] * self[1][0]
+    }
+
+    #[inline(always)]
+    fn cofactor(&self, r: usize, c: usize) -> f64 {
+        if (r + c) % 2 == 0 {
+            self.minor(r, c)
+        } else {
+            -self.minor(r, c)
+        }
+    }
+}
+
+// Because I can't do this generically yet, I just use macros to implement these methods
+// declaratively.
+// #![feature(generic_const_exprs)]
+macro_rules! impl_submatrix_for_square_matrix_n {
+    ($n_minus:expr, $n: expr) => {
+        impl Submatrix<$n_minus> for BaseMatrix<$n> {
+            #[inline(always)]
+            fn submatrix(&self, r: usize, c: usize) -> BaseMatrix<$n_minus> {
+                let mut b = [[0.0; $n_minus]; $n_minus];
+                let vec = Self::remove(&self.matrix, r, c);
+                for (r1, r2) in b.iter_mut().zip(vec.iter()) {
+                    r1.copy_from_slice(r2.as_slice());
+                }
+                BaseMatrix::from(b)
+            }
+
+            #[inline(always)]
+            fn minor(&self, r: usize, c: usize) -> f64 {
+                self.submatrix(r, c).determinant()
+            }
+
+            #[inline(always)]
+            fn determinant(&self) -> f64 {
+                self[0]
+                    .iter()
+                    .enumerate()
+                    .map(|(i, e)| e * self.cofactor(0, i))
+                    .sum()
+            }
+
+            #[inline(always)]
+            fn cofactor(&self, r: usize, c: usize) -> f64 {
+                if (r + c) % 2 == 0 {
+                    self.minor(r, c)
+                } else {
+                    -self.minor(r, c)
+                }
+            }
+        }
+    };
+}
+impl_submatrix_for_square_matrix_n!(2, 3);
+impl_submatrix_for_square_matrix_n!(3, 4);
 
 impl<const N: usize> BaseMatrix<N> {
     pub fn new<T: Into<f64>>(elem: T) -> Self {
@@ -35,68 +154,6 @@ impl<const N: usize> BaseMatrix<N> {
             })
         });
         m
-    }
-
-    // Relying on #![feature(generic_const_exprs)]
-    // Since I can't generically declare a method which returns a BaseMatrix<M-1, N-1> (const
-    // generic expr not implemented) yet
-    // https://doc.rust-lang.org/unstable-book/language-features/generic-const-exprs.html
-    pub fn submatrix(&self, r: usize, c: usize) -> BaseMatrix<{ N - 1 }>
-    where
-        [(); N - 1]:,
-    {
-        fn remove<const O: usize, const P: usize>(
-            matrix: &[[f64; P]; O],
-            r: usize,
-            c: usize,
-        ) -> Vec<Vec<f64>> {
-            let (left, right) = matrix.split_at(r);
-            let split_rows = [left, &right[1..]].concat(); // removed row at `r`
-            split_rows
-                .iter()
-                .map(|row| {
-                    let (left, right) = row.split_at(c); // remove elem at 'c' from each row
-                    [left, &right[1..]].concat()
-                })
-                .collect()
-        }
-        let mut b = [[0.0; N - 1]; N - 1];
-        let vec = remove(&self.matrix, r, c);
-        for (r1, r2) in b.iter_mut().zip(vec.iter()) {
-            r1.copy_from_slice(r2.as_slice());
-        }
-        BaseMatrix::<{ N - 1 }>::from(b)
-    }
-
-    pub fn determinant(&self) -> f64
-        where [(); N - 1]: Sized,
-    {
-        if N == 2 {
-            self.matrix[0][0] * self.matrix[1][1] - self.matrix[0][1] * self.matrix[1][0]
-        } else {
-            self[0]
-                .iter()
-                .enumerate()
-                .map(|(i, e)| e * self.cofactor(0, i))
-                .sum()
-        }
-    }
-
-    pub fn minor(&self, r: usize, c: usize) -> f64
-    {
-        let submatrix: BaseMatrix<{N - 1}> = self.submatrix(r, c);
-        submatrix.determinant()
-    }
-
-    pub fn cofactor(&self, r: usize, c: usize) -> f64
-    where
-        [(); N - 1]:,
-    {
-        if (r + c) % 2 == 0 {
-            self.minor(r, c)
-        } else {
-            -self.minor(r, c)
-        }
     }
 }
 
