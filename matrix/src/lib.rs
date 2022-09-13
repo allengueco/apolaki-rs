@@ -257,6 +257,30 @@ mod tests {
         }
 
         #[test]
+        fn testing_an_invertible_matrix_for_invertibility() {
+            let a = matrix! {
+                 6  4  4  4;
+                 5  5  7  6;
+                 4 -9  3 -7;
+                 9  1  7 -6;
+            };
+
+            assert!(a.invertible());
+        }
+
+        #[test]
+        fn testing_an_noninvertible_matrix_for_invertibility() {
+            let a = matrix! {
+                -4  4 -2 -3;
+                 9  6  2  6;
+                 0 -5  1 -5;
+                 0  0  0  0;
+            };
+
+            assert!(!a.invertible());
+        }
+
+        #[test]
         fn calculating_inverse_of_matrix() {
             let a = matrix! {
                 -5 2 6 -8;
@@ -339,5 +363,11 @@ mod tests {
 
             assert_eq!(c * b.invert(), a);
         }
+    }
+
+    #[cfg(test)]
+    mod transformations {
+        use super::*;
+        fn multiplying_by_a_translation_matrix() {}
     }
 }
