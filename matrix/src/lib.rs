@@ -377,5 +377,22 @@ mod tests {
 
             assert_eq!(Tuple::point(2, 1, 7), transform * p);
         }
+
+        #[test]
+        fn multiplying_by_the_inverse_of_translation_matrix() {
+            let transform = BaseMatrix::identity().translate(5, -3, 2);
+            let inv = transform.invert();
+            let p = Tuple::point(-3, 4, 5);
+
+            assert_eq!(Tuple::point(-8, 7, 3), inv * p);
+        }
+
+        #[test]
+        fn translation_does_not_affect_vectors() {
+            let transform = BaseMatrix::identity().translate(5, -3, 2);
+
+            let v = Tuple::vector(-3, 4, 5);
+            assert_eq!(v, transform * v);
+        }
     }
 }

@@ -273,10 +273,10 @@ impl BaseMatrix<4> {
     pub fn scale<T: Into<Tuple>>(self, t: T) -> Self {
         let tuple = t.into();
         let mut s = BaseMatrix::identity();
-        s[0][0] += tuple.x();
-        s[1][1] += tuple.y();
-        s[2][2] += tuple.z();
-        s
+        s[0][0] = tuple.x();
+        s[1][1] = tuple.y();
+        s[2][2] = tuple.z();
+        self * s
     }
 
     pub fn rotate(self, _radians: f64) -> Self {
