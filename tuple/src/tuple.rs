@@ -44,12 +44,22 @@ impl Tuple {
     }
 
     #[inline]
-    pub fn point<N: Into<f64>>(x: N, y: N, z: N) -> Self {
+    pub fn point<X, Y, Z>(x: X, y: Y, z: Z) -> Self
+    where
+        X: Into<f64>,
+        Y: Into<f64>,
+        Z: Into<f64>,
+    {
         Self(x.into(), y.into(), z.into(), 1.0)
     }
 
     #[inline]
-    pub fn vector<N: Into<f64>>(x: N, y: N, z: N) -> Self {
+    pub fn vector<X, Y, Z>(x: X, y: Y, z: Z) -> Self
+    where
+        X: Into<f64>,
+        Y: Into<f64>,
+        Z: Into<f64>,
+    {
         Self(x.into(), y.into(), z.into(), 0.0)
     }
 

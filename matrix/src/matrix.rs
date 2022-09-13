@@ -49,8 +49,6 @@ pub trait Submatrix<const N: usize> {
     }
 }
 
-impl<T, const N: usize> Invert<N> for T where T: Submatrix<N> {}
-
 pub trait Invert<const N: usize>: Submatrix<N> {
     fn invertible(&self) -> bool {
         self.determinant() != 0.
@@ -72,6 +70,7 @@ pub trait Invert<const N: usize>: Submatrix<N> {
         b.into()
     }
 }
+impl<T, const N: usize> Invert<N> for T where T: Submatrix<N> {}
 
 impl Submatrix<0> for BaseMatrix<1> {
     #[inline(always)]
@@ -167,8 +166,8 @@ macro_rules! impl_submatrix_for_square_matrix_n {
         }
     };
 }
-impl_submatrix_for_square_matrix_n!(2, 3);
-impl_submatrix_for_square_matrix_n!(3, 4);
+impl_submatrix_for_square_matrix_n! { 2, 3 }
+impl_submatrix_for_square_matrix_n! { 3, 4 }
 
 impl<const N: usize> BaseMatrix<N> {
     pub fn new<T: Into<f64>>(elem: T) -> Self {
@@ -205,10 +204,6 @@ impl<const N: usize> Default for BaseMatrix<N> {
         BaseMatrix::new(0)
     }
 }
-
-pub type Matrix2x2 = BaseMatrix<2>;
-pub type Matrix3x3 = BaseMatrix<3>;
-pub type Matrix4x4 = BaseMatrix<4>;
 
 impl<const N: usize> From<[[f64; N]; N]> for BaseMatrix<N> {
     fn from(matrix: [[f64; N]; N]) -> Self {
@@ -258,6 +253,34 @@ impl Mul<Tuple> for BaseMatrix<4> {
             r.dot(rhs)
         });
         (x, y, z, w).into()
+    }
+}
+
+impl BaseMatrix<4> {
+    pub fn translate<X, Y, Z>(self, x: X, y: Y, z: Z) -> Self
+    where
+        X: Into<f64>,
+        Y: Into<f64>,
+        Z: Into<f64>,
+    {
+        let mut s = BaseMatrix::identity();
+        s[0][3] = x.into();
+        s[1][3] = y.into();
+        s[2][3] = z.into();
+        self * s
+    }
+
+    pub fn scale<T: Into<Tuple>>(self, t: T) -> Self {
+        let tuple = t.into();
+        let mut s = BaseMatrix::identity();
+        s[0][0] += tuple.x();
+        s[1][1] += tuple.y();
+        s[2][2] += tuple.z();
+        s
+    }
+
+    pub fn rotate(self, _radians: f64) -> Self {
+        unimplemented!()
     }
 }
 

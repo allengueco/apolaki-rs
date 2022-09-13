@@ -143,7 +143,7 @@ mod tests {
                 4 8 16 32;
             };
 
-            assert_eq!(a, a * Matrix4x4::identity());
+            assert_eq!(a, a * BaseMatrix::identity());
         }
 
         #[test]
@@ -167,7 +167,7 @@ mod tests {
 
         #[test]
         fn transpose_the_identity() {
-            let identity = Matrix4x4::identity();
+            let identity = BaseMatrix::<4>::identity();
 
             assert_eq!(identity, identity.transpose());
         }
@@ -217,7 +217,7 @@ mod tests {
 
         #[test]
         fn calculating_minor_of_3x3() {
-            let a: Matrix3x3 = matrix! {
+            let a = matrix! {
                 3 5 0;
                 2 -1 -7;
                 6 -1 5;
@@ -368,6 +368,14 @@ mod tests {
     #[cfg(test)]
     mod transformations {
         use super::*;
-        fn multiplying_by_a_translation_matrix() {}
+        use apolaki_tuple::Tuple;
+
+        #[test]
+        fn multiplying_by_a_translation_matrix() {
+            let transform = BaseMatrix::identity().translate(5, -3, 2);
+            let p = Tuple::point(-3, 4, 5);
+
+            assert_eq!(Tuple::point(2, 1, 7), transform * p);
+        }
     }
 }
