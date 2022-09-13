@@ -3,10 +3,29 @@ use core::array::from_fn;
 use std::ops::{Index, IndexMut, Mul};
 
 // MxN = RxC
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct BaseMatrix<const N: usize> {
     matrix: [[f64; N]; N],
 }
+
+impl<const N: usize> PartialEq for BaseMatrix<N> {
+    fn eq(&self, other: &Self) -> bool {
+        const EPSILON: f64 = 0.00001;
+
+        fn array_equal(a1: &[f64], a2: &[f64]) -> bool {
+            a1.iter().zip(a2.iter()).all(equal)
+        }
+        fn equal(t: (&f64, &f64)) -> bool {
+            (t.0 - t.1).abs() < EPSILON
+        }
+
+        self.matrix
+            .iter()
+            .zip(other.matrix.iter())
+            .all(|(a1, a2)| array_equal(a1, a2))
+    }
+}
+
 // methods which require taking a submatrix
 pub trait Submatrix<const N: usize> {
     fn submatrix(&self, r: usize, c: usize) -> BaseMatrix<N>;
@@ -27,6 +46,30 @@ pub trait Submatrix<const N: usize> {
                 [left, &right[1..]].concat()
             })
             .collect()
+    }
+}
+
+impl<T, const N: usize> Invert<N> for T where T: Submatrix<N> {}
+
+pub trait Invert<const N: usize>: Submatrix<N> {
+    fn invertible(&self) -> bool {
+        self.determinant() != 0.
+    }
+
+    fn invert<const M: usize>(&self) -> BaseMatrix<M> {
+        if !self.invertible() {
+            panic!("tried inverting non-invertible matrix")
+        }
+        let mut b = [[0.0; M]; M];
+        (0..M).into_iter().for_each(|r| {
+            (0..M).into_iter().for_each(|c| {
+                let co = self.cofactor(r, c);
+                let d = self.determinant();
+                b[c][r] = co / d;
+            })
+        });
+
+        b.into()
     }
 }
 
