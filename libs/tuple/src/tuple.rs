@@ -44,26 +44,6 @@ impl Tuple {
     }
 
     #[inline]
-    pub fn point<X, Y, Z>(x: X, y: Y, z: Z) -> Self
-    where
-        X: Into<f64>,
-        Y: Into<f64>,
-        Z: Into<f64>,
-    {
-        Self(x.into(), y.into(), z.into(), 1.0)
-    }
-
-    #[inline]
-    pub fn vector<X, Y, Z>(x: X, y: Y, z: Z) -> Self
-    where
-        X: Into<f64>,
-        Y: Into<f64>,
-        Z: Into<f64>,
-    {
-        Self(x.into(), y.into(), z.into(), 0.0)
-    }
-
-    #[inline]
     pub fn normalize(self) -> Self {
         Self(
             self.0 / self.length(),
@@ -80,7 +60,7 @@ impl Tuple {
 
     #[inline]
     pub fn cross(self, other: Self) -> Self {
-        Self::vector(
+        vector(
             self.y() * other.z() - self.z() * other.y(),
             self.z() * other.x() - self.x() * other.z(),
             self.x() * other.y() - self.y() * other.x(),
@@ -178,4 +158,24 @@ where
     fn from(t: (X, Y, Z, W)) -> Self {
         Self(t.0.into(), t.1.into(), t.2.into(), t.3.into())
     }
+}
+
+#[inline]
+pub fn point<X, Y, Z>(x: X, y: Y, z: Z) -> Tuple
+    where
+        X: Into<f64>,
+        Y: Into<f64>,
+        Z: Into<f64>,
+{
+    Tuple(x.into(), y.into(), z.into(), 1.0)
+}
+
+#[inline]
+pub fn vector<X, Y, Z>(x: X, y: Y, z: Z) -> Tuple
+    where
+        X: Into<f64>,
+        Y: Into<f64>,
+        Z: Into<f64>,
+{
+    Tuple(x.into(), y.into(), z.into(), 0.0)
 }

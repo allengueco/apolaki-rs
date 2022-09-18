@@ -1,4 +1,4 @@
-use apolaki_tuple::Tuple;
+use apolaki_tuple::{Tuple, vector};
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, Mul, Sub};
 
@@ -42,7 +42,7 @@ impl Color {
         }
         let [r, g, b] = [lerp(self.r()), lerp(self.g()), lerp(self.b())];
 
-        return format!("{} {} {}", r, g, b);
+        format!("{} {} {}", r, g, b)
     }
 }
 
@@ -59,7 +59,7 @@ where
     B: Into<f64>,
 {
     fn from(t: (R, G, B)) -> Self {
-        Self(Tuple::vector(t.0.into(), t.1.into(), t.2.into()))
+        Self(vector(t.0.into(), t.1.into(), t.2.into()))
     }
 }
 

@@ -53,7 +53,7 @@ mod tests {
     #[cfg(test)]
     mod ops {
         use super::*;
-        use apolaki_tuple::Tuple;
+        use apolaki_tuple::{Tuple};
 
         #[test]
         fn matrix_eq_with_identical_matrices() {
@@ -370,31 +370,31 @@ mod tests {
     #[cfg(test)]
     mod transformations {
         use super::*;
-        use apolaki_tuple::Tuple;
+        use apolaki_tuple::{point, vector};
         use std::f64::consts::PI;
 
         #[test]
         fn multiplying_by_a_translation_matrix() {
             let transform = BaseMatrix::identity().translate(5, -3, 2);
-            let p = Tuple::point(-3, 4, 5);
+            let p = point(-3, 4, 5);
 
-            assert_eq!(Tuple::point(2, 1, 7), transform * p);
+            assert_eq!(point(2, 1, 7), transform * p);
         }
 
         #[test]
         fn multiplying_by_the_inverse_of_translation_matrix() {
             let transform = BaseMatrix::identity().translate(5, -3, 2);
             let inv = transform.invert();
-            let p = Tuple::point(-3, 4, 5);
+            let p = point(-3, 4, 5);
 
-            assert_eq!(Tuple::point(-8, 7, 3), inv * p);
+            assert_eq!(point(-8, 7, 3), inv * p);
         }
 
         #[test]
-        fn translation_does_not_affect_vectors() {
+        fn translation_does_not_vectors() {
             let transform = BaseMatrix::identity().translate(5, -3, 2);
 
-            let v = Tuple::vector(-3, 4, 5);
+            let v = vector(-3, 4, 5);
             assert_eq!(v, transform * v);
         }
 
@@ -402,16 +402,16 @@ mod tests {
         fn scaling_matrix_to_a_point() {
             let transform = BaseMatrix::identity().scale(2, 3, 4);
 
-            let p = Tuple::point(-4, 6, 8);
-            assert_eq!(Tuple::point(-8, 18, 32), transform * p);
+            let p = point(-4, 6, 8);
+            assert_eq!(point(-8, 18, 32), transform * p);
         }
 
         #[test]
-        fn scaling_matrix_to_a_vector() {
+        fn scaling_matrivector() {
             let transform = BaseMatrix::identity().scale(2, 3, 4);
 
-            let v = Tuple::vector(-4, 6, 8);
-            assert_eq!(Tuple::vector(-8, 18, 32), transform * v);
+            let v = vector(-4, 6, 8);
+            assert_eq!(vector(-8, 18, 32), transform * v);
         }
 
         #[test]
@@ -419,165 +419,165 @@ mod tests {
             let transform = BaseMatrix::identity().scale(2, 3, 4);
 
             let inv = transform.invert();
-            let v = Tuple::vector(-4, 6, 8);
+            let v = vector(-4, 6, 8);
 
-            assert_eq!(Tuple::vector(-2, 2, 2), inv * v);
+            assert_eq!(vector(-2, 2, 2), inv * v);
         }
 
         #[test]
         fn reflection_is_scaling_by_negative_value() {
             let transform = BaseMatrix::identity().scale(-1, 1, 1);
 
-            let p = Tuple::vector(2, 3, 4);
+            let p = vector(2, 3, 4);
 
-            assert_eq!(Tuple::vector(-2, 3, 4), transform * p);
+            assert_eq!(vector(-2, 3, 4), transform * p);
         }
 
         #[test]
         fn rotate_a_point_around_x() {
-            let p = Tuple::point(0, 1, 0);
+            let p = point(0, 1, 0);
 
             let half_quarter = BaseMatrix::identity().rotate_x(PI / 4.);
 
             let full_quarter = BaseMatrix::identity().rotate_x(PI / 2.);
 
             assert_eq!(
-                Tuple::point(0, 2_f64.sqrt() / 2., 2_f64.sqrt() / 2.),
+                point(0, 2_f64.sqrt() / 2., 2_f64.sqrt() / 2.),
                 half_quarter * p
             );
-            assert_eq!(Tuple::point(0, 0, 1), full_quarter * p);
+            assert_eq!(point(0, 0, 1), full_quarter * p);
         }
 
         #[test]
         fn inverse_of_x_rotatation_rotates_in_opposite_dir() {
-            let p = Tuple::point(0, 1, 0);
+            let p = point(0, 1, 0);
 
             let half_quarter = BaseMatrix::identity().rotate_x(PI / 4.);
             let inv = half_quarter.invert();
             assert_eq!(
-                Tuple::point(0, 2_f64.sqrt() / 2., -(2_f64.sqrt()) / 2.),
+                point(0, 2_f64.sqrt() / 2., -(2_f64.sqrt()) / 2.),
                 inv * p
             );
         }
 
         #[test]
         fn rotate_a_point_around_y() {
-            let p = Tuple::point(0, 0, 1);
+            let p = point(0, 0, 1);
 
             let half_quarter = BaseMatrix::identity().rotate_y(PI / 4.);
 
             let full_quarter = BaseMatrix::identity().rotate_y(PI / 2.);
 
             assert_eq!(
-                Tuple::point(2_f64.sqrt() / 2., 0., 2_f64.sqrt() / 2.),
+                point(2_f64.sqrt() / 2., 0., 2_f64.sqrt() / 2.),
                 half_quarter * p
             );
-            assert_eq!(Tuple::point(1, 0, 0), full_quarter * p);
+            assert_eq!(point(1, 0, 0), full_quarter * p);
         }
 
         #[test]
         fn rotate_a_point_around_z() {
-            let p = Tuple::point(0, 1, 0);
+            let p = point(0, 1, 0);
 
             let half_quarter = BaseMatrix::identity().rotate_z(PI / 4.);
 
             let full_quarter = BaseMatrix::identity().rotate_z(PI / 2.);
 
             assert_eq!(
-                Tuple::point(-(2_f64.sqrt()) / 2., 2_f64.sqrt() / 2., 0),
+                point(-(2_f64.sqrt()) / 2., 2_f64.sqrt() / 2., 0),
                 half_quarter * p
             );
-            assert_eq!(Tuple::point(-1, 0, 0), full_quarter * p);
+            assert_eq!(point(-1, 0, 0), full_quarter * p);
         }
 
         #[test]
         fn shearing_transform_moves_x_in_proportion_to_y() {
             let transform = BaseMatrix::identity().shear(1, 0, 0, 0, 0, 0);
 
-            let p = Tuple::point(2, 3, 4);
-            assert_eq!(Tuple::point(5, 3, 4), transform * p);
+            let p = point(2, 3, 4);
+            assert_eq!(point(5, 3, 4), transform * p);
         }
 
         #[test]
         fn shearing_transform_moves_x_in_proportion_to_z() {
             let transform = BaseMatrix::identity().shear(0, 1, 0, 0, 0, 0);
 
-            let p = Tuple::point(2, 3, 4);
-            assert_eq!(Tuple::point(6, 3, 4), transform * p);
+            let p = point(2, 3, 4);
+            assert_eq!(point(6, 3, 4), transform * p);
         }
 
         #[test]
         fn shearing_transform_moves_y_in_proportion_to_x() {
             let transform = BaseMatrix::identity().shear(0, 0, 1, 0, 0, 0);
 
-            let p = Tuple::point(2, 3, 4);
-            assert_eq!(Tuple::point(2, 5, 4), transform * p);
+            let p = point(2, 3, 4);
+            assert_eq!(point(2, 5, 4), transform * p);
         }
 
         #[test]
         fn shearing_transform_moves_y_in_proportion_to_z() {
             let transform = BaseMatrix::identity().shear(0, 0, 0, 1, 0, 0);
 
-            let p = Tuple::point(2, 3, 4);
-            assert_eq!(Tuple::point(2, 7, 4), transform * p);
+            let p = point(2, 3, 4);
+            assert_eq!(point(2, 7, 4), transform * p);
         }
 
         #[test]
         fn shearing_transform_moves_z_in_proportion_to_x() {
             let transform = BaseMatrix::identity().shear(0, 0, 0, 0, 1, 0);
 
-            let p = Tuple::point(2, 3, 4);
-            assert_eq!(Tuple::point(2, 3, 6), transform * p);
+            let p = point(2, 3, 4);
+            assert_eq!(point(2, 3, 6), transform * p);
         }
 
         #[test]
         fn shearing_transform_moves_z_in_proportion_to_y() {
             let transform = BaseMatrix::identity().shear(0, 0, 0, 0, 0, 1);
 
-            let p = Tuple::point(2, 3, 4);
-            assert_eq!(Tuple::point(2, 3, 7), transform * p);
+            let p = point(2, 3, 4);
+            assert_eq!(point(2, 3, 7), transform * p);
         }
 
         #[test]
         fn individual_transformation_are_applied_in_sequence() {
-            let p = Tuple::point(1, 0, 1);
+            let p = point(1, 0, 1);
             let a = BaseMatrix::identity().rotate_x(PI / 2.);
             let b = BaseMatrix::identity().scale(5, 5, 5);
             let c = BaseMatrix::identity().translate(10, 5, 7);
 
             let p2 = a * p;
 
-            assert_eq!(Tuple::point(1, -1, 0), p2);
+            assert_eq!(point(1, -1, 0), p2);
 
             let p3 = b * p2;
 
-            assert_eq!(Tuple::point(5, -5, 0), p3);
+            assert_eq!(point(5, -5, 0), p3);
 
             let p4 = c * p3;
 
-            assert_eq!(Tuple::point(15, 0, 7), p4);
+            assert_eq!(point(15, 0, 7), p4);
         }
 
         #[test]
         fn chained_transform_must_be_applied_in_reverse() {
-            let p = Tuple::point(1, 0, 1);
+            let p = point(1, 0, 1);
             let a = BaseMatrix::identity().rotate_x(PI / 2.);
             let b = BaseMatrix::identity().scale(5, 5, 5);
             let c = BaseMatrix::identity().translate(10, 5, 7);
 
             let t = c * b * a;
-            assert_eq!(Tuple::point(15, 0, 7), t * p);
+            assert_eq!(point(15, 0, 7), t * p);
         }
 
         #[test]
         fn chained_transform_must_be_applied_in_reverse_fluent() {
-            let p = Tuple::point(1, 0, 1);
+            let p = point(1, 0, 1);
 
             let t = BaseMatrix::identity()
                 .rotate_x(PI / 2.)
                 .scale(5, 5, 5)
                 .translate(10, 5, 7);
-            assert_eq!(Tuple::point(15, 0, 7), t * p);
+            assert_eq!(point(15, 0, 7), t * p);
         }
     }
 }
