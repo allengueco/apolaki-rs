@@ -59,6 +59,15 @@ pub trait Invert<const N: usize>: Submatrix<N> {
 impl<T, const N: usize> Invert<N> for T where T: Submatrix<N> {}
 
 
+trait Minor<const N: usize>: Sub<N> {
+    fn minor(&self, r: usize, c: usize) -> f64
+    where [(); N - 1]:,
+    {
+        let submatrix = self.sub(r, c);
+        submatrix.determinant()
+    }
+}
+
 trait Sub<const N: usize> {
     fn sub(&self, r: usize, c: usize) -> BaseMatrix<{N - 1}>;
     fn remove<const O: usize, const P: usize>(
