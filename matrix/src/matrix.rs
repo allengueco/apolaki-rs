@@ -319,6 +319,25 @@ impl BaseMatrix<4> {
         s[1][1] = radians.cos();
         self * s
     }
+
+    pub fn shear<XY, XZ, YX, YZ, ZX, ZY>(self, xy: XY, xz: XZ, yx: YX, yz: YZ, zx: ZX, zy: ZY) -> Self
+        where
+            XY: Into<f64>,
+            XZ: Into<f64>,
+            YX: Into<f64>,
+            YZ: Into<f64>,
+            ZX: Into<f64>,
+            ZY: Into<f64>,
+    {
+        let mut s = BaseMatrix::identity();
+        s[0][1] = xy.into();
+        s[0][2] = xz.into();
+        s[1][0] = yx.into();
+        s[1][2] = yz.into();
+        s[2][0] = zx.into();
+        s[2][1] = zy.into();
+        self * s
+    }
 }
 
 #[macro_export]

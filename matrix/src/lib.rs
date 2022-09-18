@@ -477,5 +477,53 @@ mod tests {
             assert_eq!(Tuple::point(-(2_f64.sqrt()) / 2., 2_f64.sqrt() / 2., 0), half_quarter * p);
             assert_eq!(Tuple::point(-1, 0, 0), full_quarter * p);
         }
+        
+        #[test]
+        fn shearing_transform_moves_x_in_proportion_to_y() {
+            let transform = BaseMatrix::identity().shear(1, 0, 0, 0, 0, 0);
+            
+            let p = Tuple::point(2, 3, 4);
+            assert_eq!(Tuple::point(5, 3, 4), transform * p);
+        }
+
+        #[test]
+        fn shearing_transform_moves_x_in_proportion_to_z() {
+            let transform = BaseMatrix::identity().shear(0, 1, 0, 0, 0, 0);
+
+            let p = Tuple::point(2, 3, 4);
+            assert_eq!(Tuple::point(6, 3, 4), transform * p);
+        }
+
+        #[test]
+        fn shearing_transform_moves_y_in_proportion_to_x() {
+            let transform = BaseMatrix::identity().shear(0, 0, 1, 0, 0, 0);
+
+            let p = Tuple::point(2, 3, 4);
+            assert_eq!(Tuple::point(2, 5, 4), transform * p);
+        }
+
+        #[test]
+        fn shearing_transform_moves_y_in_proportion_to_z() {
+            let transform = BaseMatrix::identity().shear(0, 0, 0, 1, 0, 0);
+
+            let p = Tuple::point(2, 3, 4);
+            assert_eq!(Tuple::point(2, 7, 4), transform * p);
+        }
+
+        #[test]
+        fn shearing_transform_moves_z_in_proportion_to_x() {
+            let transform = BaseMatrix::identity().shear(0, 0, 0, 0, 1, 0);
+
+            let p = Tuple::point(2, 3, 4);
+            assert_eq!(Tuple::point(2, 3, 6), transform * p);
+        }
+
+        #[test]
+        fn shearing_transform_moves_z_in_proportion_to_y() {
+            let transform = BaseMatrix::identity().shear(0, 0, 0, 0, 0, 1);
+
+            let p = Tuple::point(2, 3, 4);
+            assert_eq!(Tuple::point(2, 3, 7), transform * p);
+        }
     }
 }
