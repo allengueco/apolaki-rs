@@ -568,5 +568,19 @@ mod tests {
             let t = c * b * a;
             assert_eq!(Tuple::point(15, 0, 7), t * p);
         }
+
+        #[test]
+        fn chained_transform_must_be_applied_in_reverse_fluent() {
+            let p = Tuple::point(1, 0, 1);
+            let a = BaseMatrix::identity().rotate_x(PI / 2.);
+            let b = BaseMatrix::identity().scale(5, 5, 5);
+            let c = BaseMatrix::identity().translate(10, 5, 7);
+
+            let t = BaseMatrix::identity()
+                .rotate_x(PI / 2.)
+                .scale(5, 5, 5)
+                .translate(10, 5, 7);
+            assert_eq!(Tuple::point(15, 0, 7), t * p);
+        }
     }
 }

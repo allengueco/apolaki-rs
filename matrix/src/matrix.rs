@@ -268,7 +268,7 @@ impl BaseMatrix<4> {
         s[0][3] = x.into();
         s[1][3] = y.into();
         s[2][3] = z.into();
-        self * s
+        s * self
     }
 
     pub fn scale<X, Y, Z>(self, x: X, y: Y, z: Z) -> Self
@@ -281,7 +281,7 @@ impl BaseMatrix<4> {
         s[0][0] = x.into();
         s[1][1] = y.into();
         s[2][2] = z.into();
-        self * s
+        s * self
     }
 
     pub fn rotate_x<R>(self, radians: R) -> Self
@@ -294,7 +294,7 @@ impl BaseMatrix<4> {
         s[1][2] = -radians.sin();
         s[2][1] = radians.sin();
         s[2][2] = radians.cos();
-        self * s
+        s * self
     }
     pub fn rotate_y<R>(self, radians: R) -> Self
     where
@@ -306,7 +306,7 @@ impl BaseMatrix<4> {
         s[0][2] = radians.sin();
         s[2][0] = -radians.sin();
         s[2][2] = radians.cos();
-        self * s
+        s * self
     }
     pub fn rotate_z<R>(self, radians: R) -> Self
     where
@@ -318,7 +318,7 @@ impl BaseMatrix<4> {
         s[0][1] = -radians.sin();
         s[1][0] = radians.sin();
         s[1][1] = radians.cos();
-        self * s
+        s * self
     }
 
     pub fn shear<XY, XZ, YX, YZ, ZX, ZY>(
@@ -345,7 +345,7 @@ impl BaseMatrix<4> {
         s[1][2] = yz.into();
         s[2][0] = zx.into();
         s[2][1] = zy.into();
-        self * s
+        s * self
     }
 }
 
