@@ -32,7 +32,21 @@ pub trait Submatrix<const N: usize> {
     fn minor(&self, r: usize, c: usize) -> f64;
     fn determinant(&self) -> f64;
     fn cofactor(&self, r: usize, c: usize) -> f64;
-
+    fn remove<const O: usize, const P: usize>(
+        matrix: &[[f64; P]; O],
+        r: usize,
+        c: usize,
+    ) -> Vec<Vec<f64>> {
+        let (left, right) = matrix.split_at(r);
+        let split_rows = [left, &right[1..]].concat(); // removed row at `r`
+        split_rows
+            .iter()
+            .map(|row| {
+                let (left, right) = row.split_at(c); // remove elem at 'c' from each row
+                [left, &right[1..]].concat()
+            })
+            .collect()
+    }
 }
 
 pub trait Invert<const N: usize>: Submatrix<N> {
@@ -58,52 +72,6 @@ pub trait Invert<const N: usize>: Submatrix<N> {
 }
 
 impl<T> Invert<3> for T where T: Submatrix<3> {}
-
-
-trait Sub<const N: usize> {
-    fn sub(&self, r: usize, c: usize) -> BaseMatrix<{N - 1}>;
-    fn remove<const O: usize, const P: usize>(
-        matrix: &[[f64; P]; O],
-        r: usize,
-        c: usize,
-    ) -> Vec<Vec<f64>> {
-        let (left, right) = matrix.split_at(r);
-        let split_rows = [left, &right[1..]].concat(); // removed row at `r`
-        split_rows
-            .iter()
-            .map(|row| {
-                let (left, right) = row.split_at(c); // remove elem at 'c' from each row
-                [left, &right[1..]].concat()
-            })
-            .collect()
-    }
-    fn minor(&self, r: usize, c: usize) -> f64 {
-        self.sub(r, c).determinant()
-    }
-    fn determinant(&self) -> f64 {
-        self.iter()
-            .enumerate()
-            .map(|(i, e)| e * self.cofactor(0, i))
-            .sum()
-    }
-    fn cofactor(&self, r: usize, c: usize) -> f64 {
-        if (r + c) % 2 == 0 {
-            self.minor(r, c)
-        } else {
-            -self.minor(r, c)
-        }
-    }
-}
-impl<const N: usize> Sub<N> for BaseMatrix<N> {
-    fn sub(&self, r: usize, c: usize) -> BaseMatrix<{ N - 1 }> {
-        let mut b = [[0.0; { N - 1 }]; { N - 1 }];
-        let vec = Self::remove(&self.matrix, r, c);
-        for (r1, r2) in b.iter_mut().zip(vec.iter()) {
-            r1.copy_from_slice(r2.as_slice());
-        }
-        BaseMatrix::from(b)
-    }
-}
 
 impl Submatrix<0> for BaseMatrix<1> {
     #[inline(always)]
