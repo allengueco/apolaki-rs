@@ -259,10 +259,10 @@ impl Mul<Tuple> for BaseMatrix<4> {
 
 impl BaseMatrix<4> {
     pub fn translate<X, Y, Z>(self, x: X, y: Y, z: Z) -> Self
-        where
-            X: Into<f64>,
-            Y: Into<f64>,
-            Z: Into<f64>,
+    where
+        X: Into<f64>,
+        Y: Into<f64>,
+        Z: Into<f64>,
     {
         let mut s = BaseMatrix::identity();
         s[0][3] = x.into();
@@ -272,10 +272,11 @@ impl BaseMatrix<4> {
     }
 
     pub fn scale<X, Y, Z>(self, x: X, y: Y, z: Z) -> Self
-        where
-            X: Into<f64>,
-            Y: Into<f64>,
-            Z: Into<f64>, {
+    where
+        X: Into<f64>,
+        Y: Into<f64>,
+        Z: Into<f64>,
+    {
         let mut s = BaseMatrix::identity();
         s[0][0] = x.into();
         s[1][1] = y.into();
@@ -284,8 +285,8 @@ impl BaseMatrix<4> {
     }
 
     pub fn rotate_x<R>(self, radians: R) -> Self
-        where
-            R: Into<f64>,
+    where
+        R: Into<f64>,
     {
         let mut s = BaseMatrix::identity();
         let radians = radians.into();
@@ -296,8 +297,8 @@ impl BaseMatrix<4> {
         self * s
     }
     pub fn rotate_y<R>(self, radians: R) -> Self
-        where
-            R: Into<f64>,
+    where
+        R: Into<f64>,
     {
         let mut s = BaseMatrix::identity();
         let radians = radians.into();
@@ -308,8 +309,8 @@ impl BaseMatrix<4> {
         self * s
     }
     pub fn rotate_z<R>(self, radians: R) -> Self
-        where
-            R: Into<f64>,
+    where
+        R: Into<f64>,
     {
         let mut s = BaseMatrix::identity();
         let radians = radians.into();
@@ -320,14 +321,22 @@ impl BaseMatrix<4> {
         self * s
     }
 
-    pub fn shear<XY, XZ, YX, YZ, ZX, ZY>(self, xy: XY, xz: XZ, yx: YX, yz: YZ, zx: ZX, zy: ZY) -> Self
-        where
-            XY: Into<f64>,
-            XZ: Into<f64>,
-            YX: Into<f64>,
-            YZ: Into<f64>,
-            ZX: Into<f64>,
-            ZY: Into<f64>,
+    pub fn shear<XY, XZ, YX, YZ, ZX, ZY>(
+        self,
+        xy: XY,
+        xz: XZ,
+        yx: YX,
+        yz: YZ,
+        zx: ZX,
+        zy: ZY,
+    ) -> Self
+    where
+        XY: Into<f64>,
+        XZ: Into<f64>,
+        YX: Into<f64>,
+        YZ: Into<f64>,
+        ZX: Into<f64>,
+        ZY: Into<f64>,
     {
         let mut s = BaseMatrix::identity();
         s[0][1] = xy.into();
