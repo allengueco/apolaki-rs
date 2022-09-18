@@ -70,7 +70,8 @@ pub trait Invert<const N: usize>: Submatrix<N> {
         b.into()
     }
 }
-impl<T, const N: usize> Invert<N> for T where T: Submatrix<N> {}
+
+impl<T> Invert<3> for T where T: Submatrix<3> {}
 
 impl Submatrix<0> for BaseMatrix<1> {
     #[inline(always)]
@@ -258,10 +259,10 @@ impl Mul<Tuple> for BaseMatrix<4> {
 
 impl BaseMatrix<4> {
     pub fn translate<X, Y, Z>(self, x: X, y: Y, z: Z) -> Self
-    where
-        X: Into<f64>,
-        Y: Into<f64>,
-        Z: Into<f64>,
+        where
+            X: Into<f64>,
+            Y: Into<f64>,
+            Z: Into<f64>,
     {
         let mut s = BaseMatrix::identity();
         s[0][3] = x.into();
@@ -270,17 +271,53 @@ impl BaseMatrix<4> {
         self * s
     }
 
-    pub fn scale<T: Into<Tuple>>(self, t: T) -> Self {
-        let tuple = t.into();
+    pub fn scale<X, Y, Z>(self, x: X, y: Y, z: Z) -> Self
+        where
+            X: Into<f64>,
+            Y: Into<f64>,
+            Z: Into<f64>, {
         let mut s = BaseMatrix::identity();
-        s[0][0] = tuple.x();
-        s[1][1] = tuple.y();
-        s[2][2] = tuple.z();
+        s[0][0] = x.into();
+        s[1][1] = y.into();
+        s[2][2] = z.into();
         self * s
     }
 
-    pub fn rotate(self, _radians: f64) -> Self {
-        unimplemented!()
+    pub fn rotate_x<R>(self, radians: R) -> Self
+        where
+            R: Into<f64>,
+    {
+        let mut s = BaseMatrix::identity();
+        let radians = radians.into();
+        s[1][1] = radians.cos();
+        s[1][2] = -radians.sin();
+        s[2][1] = radians.sin();
+        s[2][2] = radians.cos();
+        self * s
+    }
+    pub fn rotate_y<R>(self, radians: R) -> Self
+        where
+            R: Into<f64>,
+    {
+        let mut s = BaseMatrix::identity();
+        let radians = radians.into();
+        s[0][0] = radians.cos();
+        s[0][2] = radians.sin();
+        s[2][0] = -radians.sin();
+        s[2][2] = radians.cos();
+        self * s
+    }
+    pub fn rotate_z<R>(self, radians: R) -> Self
+        where
+            R: Into<f64>,
+    {
+        let mut s = BaseMatrix::identity();
+        let radians = radians.into();
+        s[0][0] = radians.cos();
+        s[0][1] = -radians.sin();
+        s[1][0] = radians.sin();
+        s[1][1] = radians.cos();
+        self * s
     }
 }
 

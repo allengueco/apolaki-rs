@@ -5,6 +5,7 @@ pub use matrix::*;
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn constructing_and_inspecting_4x4() {
         let m = matrix! {
@@ -305,6 +306,7 @@ mod tests {
 
             assert_eq!(b, expected);
         }
+
         #[test]
         fn calculating_inverse_of_another_matrix() {
             let a = matrix! {
@@ -367,6 +369,7 @@ mod tests {
 
     #[cfg(test)]
     mod transformations {
+        use std::f64::consts::PI;
         use super::*;
         use apolaki_tuple::Tuple;
 
@@ -393,6 +396,86 @@ mod tests {
 
             let v = Tuple::vector(-3, 4, 5);
             assert_eq!(v, transform * v);
+        }
+
+        #[test]
+        fn scaling_matrix_to_a_point() {
+            let transform = BaseMatrix::identity().scale(2, 3, 4);
+
+            let p = Tuple::point(-4, 6, 8);
+            assert_eq!(Tuple::point(-8, 18, 32), transform * p);
+        }
+
+        #[test]
+        fn scaling_matrix_to_a_vector() {
+            let transform = BaseMatrix::identity().scale(2, 3, 4);
+
+            let v = Tuple::vector(-4, 6, 8);
+            assert_eq!(Tuple::vector(-8, 18, 32), transform * v);
+        }
+
+        #[test]
+        fn multiplying_by_inverse_of_scaling_matrix() {
+            let transform = BaseMatrix::identity().scale(2, 3, 4);
+
+            let inv = transform.invert();
+            let v = Tuple::vector(-4, 6, 8);
+
+            assert_eq!(Tuple::vector(-2, 2, 2), inv * v);
+        }
+
+        #[test]
+        fn reflection_is_scaling_by_negative_value() {
+            let transform = BaseMatrix::identity().scale(-1, 1, 1);
+
+            let p = Tuple::vector(2, 3, 4);
+
+            assert_eq!(Tuple::vector(-2, 3, 4), transform * p);
+        }
+
+        #[test]
+        fn rotate_a_point_around_x() {
+            let p = Tuple::point(0, 1, 0);
+
+            let half_quarter = BaseMatrix::identity().rotate_x(PI / 4.);
+
+            let full_quarter = BaseMatrix::identity().rotate_x(PI / 2.);
+
+            assert_eq!(Tuple::point(0, 2_f64.sqrt() / 2., 2_f64.sqrt() / 2.), half_quarter * p);
+            assert_eq!(Tuple::point(0, 0, 1), full_quarter * p);
+        }
+
+        #[test]
+        fn inverse_of_x_rotatation_rotates_in_opposite_dir() {
+            let p = Tuple::point(0, 1, 0);
+
+            let half_quarter = BaseMatrix::identity().rotate_x(PI / 4.);
+            let inv = half_quarter.invert();
+            assert_eq!(Tuple::point(0, 2_f64.sqrt() / 2., -(2_f64.sqrt()) / 2.), inv * p);
+        }
+
+        #[test]
+        fn rotate_a_point_around_y() {
+            let p = Tuple::point(0, 0, 1);
+
+            let half_quarter = BaseMatrix::identity().rotate_y(PI / 4.);
+
+            let full_quarter = BaseMatrix::identity().rotate_y(PI / 2.);
+
+            assert_eq!(Tuple::point(2_f64.sqrt() / 2., 0., 2_f64.sqrt() / 2.), half_quarter * p);
+            assert_eq!(Tuple::point(1, 0, 0), full_quarter * p);
+        }
+
+        #[test]
+        fn rotate_a_point_around_z() {
+            let p = Tuple::point(0, 1, 0);
+
+            let half_quarter = BaseMatrix::identity().rotate_z(PI / 4.);
+
+            let full_quarter = BaseMatrix::identity().rotate_z(PI / 2.);
+
+            assert_eq!(Tuple::point(-(2_f64.sqrt()) / 2., 2_f64.sqrt() / 2., 0), half_quarter * p);
+            assert_eq!(Tuple::point(-1, 0, 0), full_quarter * p);
         }
     }
 }
