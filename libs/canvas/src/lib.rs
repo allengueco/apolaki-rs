@@ -1,7 +1,5 @@
 mod canvas;
 
-use apolaki_color;
-
 pub use canvas::Canvas;
 
 #[cfg(test)]

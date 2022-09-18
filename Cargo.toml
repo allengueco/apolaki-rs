@@ -1,8 +1,5 @@
 [workspace]
 
 members = [
-    "canvas",
-    "tuple",
-    "color",
-    "matrix",
+    "libs/*"
 ]

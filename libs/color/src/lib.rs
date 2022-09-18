@@ -1,5 +1,3 @@
-use apolaki_tuple::*;
-
 mod color;
 
 pub use color::Color;

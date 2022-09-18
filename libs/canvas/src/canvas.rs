@@ -1,7 +1,5 @@
 use apolaki_color::Color;
-use std::borrow::Borrow;
 use std::ops::Index;
-use std::path::Iter;
 
 #[derive(Debug)]
 pub struct Canvas {
@@ -89,23 +87,3 @@ impl Index<PixelIndex> for Canvas {
     }
 }
 
-// Top right starts at 0,
-pub enum SliceIndex {
-    Row(usize),
-    Column(usize),
-}
-
-impl Index<SliceIndex> for Canvas {
-    type Output = [Color];
-
-    fn index(&self, index: SliceIndex) -> &Self::Output {
-        todo!();
-        match index {
-            SliceIndex::Row(r) => &self.pixels.index(r),
-
-            SliceIndex::Column(c) => {
-                unimplemented!()
-            }
-        }
-    }
-}
