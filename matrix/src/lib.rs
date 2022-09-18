@@ -1,3 +1,4 @@
+#![feature(generic_const_exprs)]
 mod matrix;
 
 pub use matrix::*;
