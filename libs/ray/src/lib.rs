@@ -8,6 +8,9 @@ mod ray {
     }
 
     impl Ray {
+        pub fn new(origin: Tuple, dir: Tuple) -> Self {
+            Self { origin, dir }
+        }
         pub fn position<T: Into<f64>>(&self, t: T) -> Tuple {
             self.origin + self.dir * t.into()
         }
@@ -17,16 +20,16 @@ mod ray {
 pub use ray::*;
 
 #[cfg(test)]
-mod tests {
-    use apolaki_tuple::{point, vector};
+mod ray_tests {
     use super::*;
+    use apolaki_tuple::{point, vector};
 
     #[test]
     fn creating_and_querying_a_ray() {
         let origin = point(1, 2, 3);
         let dir = vector(4, 5, 6);
 
-        let r = Ray { origin, dir };
+        let r = Ray::new(origin, dir);
 
         assert_eq!(origin, r.origin);
         assert_eq!(dir, r.dir);
@@ -34,10 +37,7 @@ mod tests {
 
     #[test]
     fn computing_point_from_distance() {
-        let r = Ray {
-            origin: point(2, 3, 4),
-            dir: vector(1, 0, 0),
-        };
+        let r = Ray::new(point(2, 3, 4), vector(1, 0, 0));
 
         assert_eq!(point(2, 3, 4), r.position(0));
         assert_eq!(point(3, 3, 4), r.position(1));

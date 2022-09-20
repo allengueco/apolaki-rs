@@ -2,7 +2,7 @@ mod tuple;
 
 pub use tuple::*;
 #[cfg(test)]
-mod test {
+mod tuple_tests {
     use super::*;
 
     #[test]

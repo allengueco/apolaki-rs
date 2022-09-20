@@ -3,7 +3,7 @@ mod color;
 pub use color::Color;
 
 #[cfg(test)]
-mod tests {
+mod color_tests {
     use super::*;
 
     #[test]

@@ -3,7 +3,7 @@ mod matrix;
 pub use matrix::*;
 
 #[cfg(test)]
-mod tests {
+mod matrix_tests {
     use super::*;
 
     #[test]
@@ -53,7 +53,7 @@ mod tests {
     #[cfg(test)]
     mod ops {
         use super::*;
-        use apolaki_tuple::{Tuple};
+        use apolaki_tuple::Tuple;
 
         #[test]
         fn matrix_eq_with_identical_matrices() {
@@ -454,10 +454,7 @@ mod tests {
 
             let half_quarter = BaseMatrix::identity().rotate_x(PI / 4.);
             let inv = half_quarter.invert();
-            assert_eq!(
-                point(0, 2_f64.sqrt() / 2., -(2_f64.sqrt()) / 2.),
-                inv * p
-            );
+            assert_eq!(point(0, 2_f64.sqrt() / 2., -(2_f64.sqrt()) / 2.), inv * p);
         }
 
         #[test]

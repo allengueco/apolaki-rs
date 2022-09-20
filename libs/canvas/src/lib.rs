@@ -3,7 +3,7 @@ mod canvas;
 pub use canvas::Canvas;
 
 #[cfg(test)]
-mod tests {
+mod canvas_tests {
     use crate::canvas::PixelIndex;
     use crate::Canvas;
     use apolaki_color::Color;
