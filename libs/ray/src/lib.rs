@@ -44,4 +44,6 @@ mod ray_tests {
         assert_eq!(point(1, 3, 4), r.position(-1));
         assert_eq!(point(4.5, 3, 4), r.position(2.5));
     }
+
+    
 }
