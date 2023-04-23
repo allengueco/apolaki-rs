@@ -1,11 +1,10 @@
 [package]
-name = "apolaki_ray"
+name = "apolaki_transform"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-apolaki_tuple = { path = "../tuple" }
-apolaki_transform = { path = "../transform" }
 apolaki_matrix = { path = "../matrix" }
+

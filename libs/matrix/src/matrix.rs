@@ -59,8 +59,8 @@ pub trait Invert<const N: usize>: Submatrix<N> {
             panic!("tried inverting non-invertible matrix")
         }
         let mut b = [[0.0; M]; M];
-        (0..M).into_iter().for_each(|r| {
-            (0..M).into_iter().for_each(|c| {
+        (0..M).for_each(|r| {
+            (0..M).for_each(|c| {
                 let co = self.cofactor(r, c);
                 let d = self.determinant();
                 b[c][r] = co / d;
@@ -179,8 +179,8 @@ impl<const N: usize> BaseMatrix<N> {
 
     pub fn identity() -> Self {
         let mut init = [[0.0; N]; N];
-        (0..N).into_iter().for_each(|r| {
-            (0..N).into_iter().for_each(|c| {
+        (0..N).for_each(|r| {
+            (0..N).for_each(|c| {
                 if r == c {
                     init[r][c] = 1.0
                 }
@@ -190,9 +190,9 @@ impl<const N: usize> BaseMatrix<N> {
     }
 
     pub fn transpose(&self) -> Self {
-        let mut m = self.clone();
-        (0..N).into_iter().for_each(|r| {
-            (0..N).into_iter().for_each(|c| {
+        let mut m = *self;
+        (0..N).for_each(|r| {
+            (0..N).for_each(|c| {
                 m[r][c] = self[c][r];
             })
         });

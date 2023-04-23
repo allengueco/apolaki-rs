@@ -1,4 +1,4 @@
-use apolaki_tuple::{Tuple, vector};
+use apolaki_tuple::{vector, Tuple};
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, Mul, Sub};
 

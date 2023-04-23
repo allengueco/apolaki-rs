@@ -86,4 +86,3 @@ impl Index<PixelIndex> for Canvas {
         &self.pixels[index.1][index.0]
     }
 }
-

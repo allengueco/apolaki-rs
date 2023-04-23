@@ -132,6 +132,19 @@ where
     }
 }
 
+impl Mul<Tuple> for Tuple {
+    type Output = Self;
+
+    fn mul(self, rhs: Tuple) -> Self::Output {
+        Self(
+            self.0 * rhs.0,
+            self.1 * rhs.1,
+            self.2 * rhs.2,
+            self.3 * rhs.3
+        )
+    }
+}
+
 impl<N> Div<N> for Tuple
 where
     N: Into<f64> + Copy + Clone,
@@ -162,20 +175,20 @@ where
 
 #[inline]
 pub fn point<X, Y, Z>(x: X, y: Y, z: Z) -> Tuple
-    where
-        X: Into<f64>,
-        Y: Into<f64>,
-        Z: Into<f64>,
+where
+    X: Into<f64>,
+    Y: Into<f64>,
+    Z: Into<f64>,
 {
     Tuple(x.into(), y.into(), z.into(), 1.0)
 }
 
 #[inline]
 pub fn vector<X, Y, Z>(x: X, y: Y, z: Z) -> Tuple
-    where
-        X: Into<f64>,
-        Y: Into<f64>,
-        Z: Into<f64>,
+where
+    X: Into<f64>,
+    Y: Into<f64>,
+    Z: Into<f64>,
 {
     Tuple(x.into(), y.into(), z.into(), 0.0)
 }

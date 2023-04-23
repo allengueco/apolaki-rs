@@ -1,5 +1,9 @@
+pub use ray::*;
+
 mod ray {
-    use apolaki_tuple::Tuple;
+    use apolaki_matrix::BaseMatrix;
+    use apolaki_transform::*;
+    use apolaki_tuple::{Tuple};
 
     #[derive(Clone, Copy, Debug)]
     pub struct Ray {
@@ -15,14 +19,24 @@ mod ray {
             self.origin + self.dir * t.into()
         }
     }
-}
 
-pub use ray::*;
+    impl Transform for Ray {
+        fn transform(&self, m: BaseMatrix<4>) -> Self {
+            Self {
+                origin: m * self.origin,
+                dir: m * self.dir,
+            }
+        }
+    }
+}
 
 #[cfg(test)]
 mod ray_tests {
-    use super::*;
+    use apolaki_matrix::BaseMatrix;
+    use apolaki_transform::*;
     use apolaki_tuple::{point, vector};
+
+    use super::*;
 
     #[test]
     fn creating_and_querying_a_ray() {
@@ -45,5 +59,26 @@ mod ray_tests {
         assert_eq!(point(4.5, 3, 4), r.position(2.5));
     }
 
-    
+    #[test]
+    fn transforming_a_ray() {
+        let r = Ray::new(point(1, 2, 3), vector(0, 1, 0));
+
+        let m = BaseMatrix::identity().translate(3, 4, 5);
+        dbg!(&m);
+
+        let r2 = r.transform(m);
+        assert_eq!(point(4, 6, 8), r2.origin);
+        assert_eq!(vector(0, 1, 0), r2.dir);
+    }
+
+    #[test]
+    fn scaling_a_ray() {
+        let r = Ray::new(point(1, 2, 3), vector(0, 1, 0));
+
+        let m = BaseMatrix::identity().scale(2, 3, 4);
+
+        let r2 = r.transform(m);
+        assert_eq!(point(2, 6, 12), r2.origin);
+        assert_eq!(vector(0, 3, 0), r2.dir);
+    }
 }

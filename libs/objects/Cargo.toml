@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 apolaki_ray = { path = "../ray" }
 apolaki_tuple = { path = "../tuple" }
+apolaki_matrix = { path = "../matrix" }
