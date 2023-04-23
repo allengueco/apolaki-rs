@@ -1,10 +1,43 @@
 mod objects {
     use std::ops::Index;
-
     use apolaki_ray::Ray;
 
-    pub type Intersections<O> = Vec<Intersection<O>>;
+    #[derive(Clone, Debug, PartialEq)]
+    pub struct Intersections<O: Intersect> {
+        intersections: Vec<Intersection<O>>
+    }
 
+    impl<O: Intersect> Intersections<O> {
+        pub fn from(intersections: Vec<Intersection<O>>) -> Self {
+            Self {
+                intersections
+            }
+        }
+
+        pub fn len(&self) -> usize {
+            self.intersections.len()
+        }
+
+        pub fn is_empty(&self) -> bool {
+            self.intersections.is_empty()
+        }
+
+        pub fn hit(&self) -> Option<&Intersection<O>> {
+            self.intersections.iter()
+                .filter(|i| i.t > 0.)
+                .min_by(|i1, i2| i1.t.total_cmp(&i2.t))
+        }
+    }
+
+    impl<O: Intersect> Index<usize> for Intersections<O> {
+        type Output = Intersection<O>;
+
+        fn index(&self, index: usize) -> &Self::Output {
+            self.intersections.index(index)
+        }
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq)]
     pub struct Intersection<O: Intersect> {
         pub t: f64,
         pub obj: O,
@@ -16,16 +49,9 @@ mod objects {
         }
     }
 
-    impl<O> Index<usize> for Intersection<O> where O: Intersect {
-        type Output = Intersection<O>;
-
-        fn index(&self, index: usize) -> &Self::Output {
-            self
-        }
-    }
-
-    pub trait Intersect: Sized {
-        fn intersect(&self, ray: Ray) -> Option<Intersections<Self>>;
+    pub trait Intersect {
+        type O: Intersect;
+        fn intersect(&self, ray: Ray) -> Option<Intersections<Self::O>>;
     }
 }
 
@@ -34,7 +60,7 @@ mod sphere {
     use apolaki_ray::Ray;
     use apolaki_tuple::point;
 
-    #[derive(Clone, Copy, Debug)]
+    #[derive(Clone, Copy, Debug, PartialEq)]
     pub struct Sphere {
         pub radius: f64,
     }
@@ -52,7 +78,8 @@ mod sphere {
     }
 
     impl Intersect for Sphere {
-        fn intersect(&self, ray: Ray) -> Option<Intersections<Self>> {
+        type O = Self;
+        fn intersect(&self, ray: Ray) -> Option<Intersections<Self::O>> {
             let sphere_to_ray = ray.origin - point(0, 0, 0);
             let a = ray.dir.dot(ray.dir);
             let b = 2. * ray.dir.dot(sphere_to_ray);
@@ -63,10 +90,10 @@ mod sphere {
             if discriminant < 0. {
                 None
             } else {
-                Some(Vec::from([
+                Some(Intersections::from(Vec::from([
                     Intersection::new((-b - discriminant.sqrt()) / (2. * a), self.clone()),
                     Intersection::new((-b + discriminant.sqrt()) / (2. * a), self.clone()),
-                ]))
+                ])))
             }
         }
     }
@@ -131,6 +158,19 @@ mod objects_tests {
             assert_eq!(xs[0].t, -6.0);
             assert_eq!(xs[1].t, -4.0);
         }
+
+        #[test]
+        fn intersect_sets_the_object_on_the_intersection() {
+            let ray = Ray::new(point(0, 0, -5), vector(0, 0, 1));
+            let s = Sphere::default();
+
+            let xs = s.intersect(ray).expect("Must intersect");
+
+            assert_eq!(xs.len(), 2);
+            assert_eq!(xs[0].obj, s);
+            assert_eq!(xs[1].obj, s);
+        }
+
     }
 
     #[cfg(test)]
@@ -148,16 +188,66 @@ mod objects_tests {
         }
 
         #[test]
-        fn aggregating_intersectinos() {
+        fn aggregating_intersections() {
             let s = Sphere::default();
             let i1 = Intersection::new(1, s);
             let i2 = Intersection::new(2, s);
 
-            let xs = vec![i1, i2];
+            let xs = Intersections::from(vec![i1, i2]);
 
             assert_eq!(xs.len(), 2);
             assert_eq!(xs[0].t, 1.0);
             assert_eq!(xs[1].t, 2.0);
+        }
+
+        #[test]
+        fn the_hit_when_all_intersections_have_positive_t() {
+            let s = Sphere::default();
+            let i1 = Intersection::new(1, s);
+            let i2 = Intersection::new(2, s);
+            let xs = Intersections::from(vec![i2, i1]);
+
+            let i = xs.hit();
+
+            assert_eq!(i, Some(&i1));
+        }
+
+        #[test]
+        fn the_hit_when_some_intersections_have_negative_t() {
+            let s = Sphere::default();
+            let i1 = Intersection::new(-1, s);
+            let i2 = Intersection::new(1, s);
+            let xs = Intersections::from(vec![i2, i1]);
+
+            let i = xs.hit();
+
+            assert_eq!(i, Some(&i2));
+        }
+
+        #[test]
+        fn the_hit_when_all_intersections_have_negative_t() {
+            let s = Sphere::default();
+            let i1 = Intersection::new(-2, s);
+            let i2 = Intersection::new(-1, s);
+            let xs = Intersections::from(vec![i2, i1]);
+
+            let i = xs.hit();
+
+            assert_eq!(i, None);
+        }
+
+        #[test]
+        fn the_hit_is_always_the_lowest_nonnegative_intersection() {
+            let s = Sphere::default();
+            let i1 = Intersection::new(5, s);
+            let i2 = Intersection::new(7, s);
+            let i3 = Intersection::new(-3, s);
+            let i4 = Intersection::new(2, s);
+            let xs = Intersections::from(vec![i1, i2, i3, i4]);
+
+            let i = xs.hit();
+
+            assert_eq!(i, Some(&i4));
         }
     }
 }
