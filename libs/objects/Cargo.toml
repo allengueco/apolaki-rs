@@ -9,3 +9,4 @@ edition = "2021"
 apolaki_ray = { path = "../ray" }
 apolaki_tuple = { path = "../tuple" }
 apolaki_matrix = { path = "../matrix" }
+apolaki_transform = { path = "../transform" }
