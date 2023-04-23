@@ -14,8 +14,8 @@ mod tuple_tests {
         assert_eq!(3.1, a.z());
         assert_eq!(1.0, a.w());
 
-        assert!(a.is_vec());
-        assert!(!a.is_point());
+        assert!(!a.is_vec());
+        assert!(a.is_point());
     }
 
     #[test]
@@ -27,8 +27,8 @@ mod tuple_tests {
         assert_eq!(3.1, a.z());
         assert_eq!(0.0, a.w());
 
-        assert!(a.is_point());
-        assert!(!a.is_vec());
+        assert!(!a.is_point());
+        assert!(a.is_vec());
     }
 
     #[test]

@@ -26,12 +26,12 @@ impl Tuple {
 
     #[inline]
     pub fn is_point(&self) -> bool {
-        self.w() == 0.0
+        self.w() == 1.0
     }
 
     #[inline]
     pub fn is_vec(&self) -> bool {
-        self.w() == 1.0
+        self.w() == 0.0
     }
 
     #[inline]

@@ -1,7 +1,7 @@
 use apolaki_matrix::{BaseMatrix, Invert};
 use apolaki_ray::Ray;
 use apolaki_transform::Transform;
-use apolaki_tuple::point;
+use apolaki_tuple::{point, Tuple};
 
 use crate::intersect::{Intersect, Intersection, Intersections};
 
@@ -14,6 +14,14 @@ pub struct Sphere {
 impl Sphere {
     pub fn new(radius: f64) -> Self {
         Self { radius, transform: BaseMatrix::identity() }
+    }
+
+    pub fn normal_at(&self, at: Tuple) -> Tuple {
+        if at.is_vec() {
+            panic!("parameter `at` must be a point")
+        }
+
+        (at - point(0, 0, 0)).normalize()
     }
 }
 
@@ -152,6 +160,43 @@ mod sphere_tests {
         let xs = s.intersect(r);
 
         assert_eq!(None, xs);
+    }
+
+    #[test]
+    fn normal_on_a_sphere_at_a_point_on_x_axis() {
+        let s = Sphere::default();
+
+        let normal = s.normal_at(point(1, 0, 0));
+
+        assert_eq!(vector(1, 0, 0), normal);
+    }
+
+    #[test]
+    fn normal_on_a_sphere_at_a_point_on_y_axis() {
+        let s = Sphere::default();
+
+        let normal = s.normal_at(point(0, 1, 0));
+
+        assert_eq!(vector(0, 1, 0), normal);
+    }
+
+    #[test]
+    fn normal_on_a_sphere_at_a_point_on_z_axis() {
+        let s = Sphere::default();
+
+        let normal = s.normal_at(point(0, 0, 1));
+
+        assert_eq!(vector(0, 0, 1), normal);
+    }
+
+    #[test]
+    fn normal_on_a_sphere_at_a_nonaxial_point() {
+        let n = 3f64.sqrt() / 3.0;
+        let s = Sphere::default();
+
+        let normal = s.normal_at(point(n, n, n));
+
+        assert_eq!(vector(n, n, n), normal);
     }
 }
 
