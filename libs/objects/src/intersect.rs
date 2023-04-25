@@ -54,8 +54,8 @@ pub trait Intersect {
 
 #[cfg(test)]
 mod intersections_test {
-    use crate::Sphere;
     use super::*;
+    use crate::Sphere;
 
     #[test]
     fn an_intersection_encapsulates_t_and_object() {
@@ -117,7 +117,7 @@ mod intersections_test {
     }
 
     #[test]
-    fn the_hit_is_always_the_lowest_nonnegative_intersection() {
+    fn the_hit_is_always_the_lowest_non_negative_intersection() {
         let s = Sphere::default();
         let i1 = Intersection::new(5, s);
         let i2 = Intersection::new(7, s);
