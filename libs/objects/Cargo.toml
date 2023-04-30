@@ -10,3 +10,4 @@ apolaki_ray = { path = "../ray" }
 apolaki_tuple = { path = "../tuple" }
 apolaki_matrix = { path = "../matrix" }
 apolaki_transform = { path = "../transform" }
+apolaki_material = { version = "0.1.0", path = "../material" }

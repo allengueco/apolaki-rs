@@ -1,3 +1,4 @@
+use apolaki_material::Material;
 use apolaki_matrix::{BaseMatrix, Invert};
 use apolaki_ray::Ray;
 use apolaki_transform::Transform;
@@ -9,6 +10,7 @@ use crate::intersect::{Intersect, Intersection, Intersections};
 pub struct Sphere {
     pub radius: f64,
     pub transform: BaseMatrix<4>,
+    pub material: Material,
 }
 
 impl Sphere {
@@ -16,6 +18,7 @@ impl Sphere {
         Self {
             radius,
             transform: BaseMatrix::identity(),
+            ..Default::default()
         }
     }
 
@@ -45,6 +48,7 @@ impl Default for Sphere {
         Self {
             radius: 1.0,
             transform: BaseMatrix::identity(),
+            material: Material::default(),
         }
     }
 }
@@ -73,6 +77,7 @@ impl Intersect for Sphere {
 
 #[cfg(test)]
 mod sphere_tests {
+    use std::f32::consts::FRAC_1_SQRT_2;
     use std::f64::consts::{PI, SQRT_2};
 
     use apolaki_ray::Ray;
@@ -224,9 +229,9 @@ mod sphere_tests {
         let mut s = Sphere::default();
         s.transform = BaseMatrix::identity().translate(0, 1, 0);
 
-        let n = s.normal_at(point(0, 1.70711, -0.70711));
+        let n = s.normal_at(point(0, 1.70711, -FRAC_1_SQRT_2));
 
-        assert_eq!(vector(0, 0.70711, -0.70711), n);
+        assert_eq!(vector(0, FRAC_1_SQRT_2, -FRAC_1_SQRT_2), n);
     }
 
     #[test]
@@ -238,5 +243,25 @@ mod sphere_tests {
         let n = s.normal_at(point(0, SQRT_2 / 2.0, -SQRT_2 / 2.0));
 
         assert_eq!(vector(0, 0.97014, -0.24254), n);
+    }
+
+    #[test]
+    fn sphere_has_default_material() {
+        let s = Sphere::default();
+
+        let m = s.material;
+
+        assert_eq!(Material::default(), m);
+    }
+
+    #[test]
+    fn sphere_may_be_assigned_a_material() {
+        let mut s = Sphere::default();
+        let mut m = Material::default();
+        m.ambient = 1.0;
+
+        s.material = m;
+
+        assert_eq!(m, s.material);
     }
 }

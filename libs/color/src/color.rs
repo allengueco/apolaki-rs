@@ -19,6 +19,18 @@ impl Default for Color {
 }
 
 impl Color {
+    pub const BLACK: Color = Color(Tuple(0., 0., 0., 1.));
+    pub const WHITE: Color = Color(Tuple(1., 1., 1., 1.));
+    #[inline]
+    pub fn new<X, Y, Z>(x: X, y: Y, z: Z) -> Self
+    where
+        X: Into<f64>,
+        Y: Into<f64>,
+        Z: Into<f64>,
+    {
+        Self(vector(x, y, z))
+    }
+
     #[inline]
     pub fn r(self) -> f64 {
         self.0.x()
@@ -48,7 +60,16 @@ impl Color {
 
 impl PartialEq for Color {
     fn eq(&self, other: &Self) -> bool {
-        self.0.eq(&other.0)
+        // we'll only consider using Tuple's xyz
+        const EPSILON: f64 = 0.00001;
+        fn equal(t: (f64, f64)) -> bool {
+            (t.0 - t.1).abs() < EPSILON
+        }
+
+        let x = [self.0.x(), self.0.y(), self.0.z()].into_iter();
+        let y = [other.0.x(), other.0.y(), other.0.z()].into_iter();
+
+        x.zip(y).all(equal)
     }
 }
 

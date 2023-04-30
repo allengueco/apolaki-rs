@@ -1,7 +1,7 @@
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
 #[derive(Copy, Clone, Debug)]
-pub struct Tuple(f64, f64, f64, f64);
+pub struct Tuple(pub f64, pub f64, pub f64, pub f64);
 
 impl Tuple {
     #[inline]
