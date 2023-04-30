@@ -13,7 +13,10 @@ pub struct Sphere {
 
 impl Sphere {
     pub fn new(radius: f64) -> Self {
-        Self { radius, transform: BaseMatrix::identity() }
+        Self {
+            radius,
+            transform: BaseMatrix::identity(),
+        }
     }
 
     pub fn normal_at(&self, at: Tuple) -> Tuple {
@@ -21,13 +24,28 @@ impl Sphere {
             panic!("parameter `at` must be a point")
         }
 
-        (at - point(0, 0, 0)).normalize()
+        let object_normal = {
+            let object_point = self.transform.invert() * at;
+            object_point - point(0, 0, 0)
+        };
+
+        let mut world_normal = self.transform.invert().transpose() * object_normal;
+        world_normal.set_w(0.);
+
+        world_normal.normalize()
+    }
+
+    pub fn transform(&mut self, transform: BaseMatrix<4>) {
+        self.transform = self.transform * transform;
     }
 }
 
 impl Default for Sphere {
     fn default() -> Self {
-        Self { radius: 1.0, transform: BaseMatrix::identity() }
+        Self {
+            radius: 1.0,
+            transform: BaseMatrix::identity(),
+        }
     }
 }
 
@@ -55,6 +73,8 @@ impl Intersect for Sphere {
 
 #[cfg(test)]
 mod sphere_tests {
+    use std::f64::consts::{PI, SQRT_2};
+
     use apolaki_ray::Ray;
     use apolaki_tuple::{point, vector};
 
@@ -198,5 +218,25 @@ mod sphere_tests {
 
         assert_eq!(vector(n, n, n), normal);
     }
-}
 
+    #[test]
+    fn computing_normal_on_translated_sphere() {
+        let mut s = Sphere::default();
+        s.transform = BaseMatrix::identity().translate(0, 1, 0);
+
+        let n = s.normal_at(point(0, 1.70711, -0.70711));
+
+        assert_eq!(vector(0, 0.70711, -0.70711), n);
+    }
+
+    #[test]
+    fn computing_normal_on_transformed_sphere() {
+        let mut s = Sphere::default();
+        let m = BaseMatrix::identity().scale(1, 0.5, 1) * BaseMatrix::identity().rotate_z(PI / 5.0);
+        s.transform = m;
+
+        let n = s.normal_at(point(0, SQRT_2 / 2.0, -SQRT_2 / 2.0));
+
+        assert_eq!(vector(0, 0.97014, -0.24254), n);
+    }
+}

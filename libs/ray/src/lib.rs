@@ -3,7 +3,7 @@ pub use ray::*;
 mod ray {
     use apolaki_matrix::BaseMatrix;
     use apolaki_transform::*;
-    use apolaki_tuple::{Tuple};
+    use apolaki_tuple::Tuple;
 
     #[derive(Clone, Copy, Debug)]
     pub struct Ray {
@@ -64,7 +64,6 @@ mod ray_tests {
         let r = Ray::new(point(1, 2, 3), vector(0, 1, 0));
 
         let m = BaseMatrix::identity().translate(3, 4, 5);
-        dbg!(&m);
 
         let r2 = r.transform(m);
         assert_eq!(point(4, 6, 8), r2.origin);

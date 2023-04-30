@@ -24,7 +24,6 @@ mod canvas_tests {
     fn writing_a_pixel_to_canvas() {
         let red: Color = (1, 0, 0).into();
         let mut c = Canvas::with_size(10, 20);
-        dbg!(&c);
         c.write(2, 3, red);
 
         assert_eq!(red, c[PixelIndex(2, 3)])
