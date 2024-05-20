@@ -225,6 +225,16 @@ mod sphere_tests {
     }
 
     #[test]
+    fn normal_is_a_normalized_vector() {
+        let n = 3f64.sqrt() / 3.0;
+        let s = Sphere::default();
+
+        let normal = s.normal_at(point(n, n, n));
+        
+        assert_eq!(normal, normal.normalize());
+    }
+
+    #[test]
     fn computing_normal_on_translated_sphere() {
         let mut s = Sphere::default();
         s.transform = BaseMatrix::identity().translate(0, 1, 0);

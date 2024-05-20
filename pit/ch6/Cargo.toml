@@ -1,0 +1,13 @@
+[package]
+name = "ch6"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+apolaki_objects = { path = "../../libs/objects" } 
+apolaki_color = { path  = "../../libs/color" }
+apolaki_material = { path  = "../../libs/material" }
+apolaki_light = { path  = "../../libs/light" }
+apolaki_tuple = { path  = "../../libs/tuple" }
+apolaki_canvas = { path = "../../libs/canvas" }
+apolaki_ray = { path = "../../libs/ray" }
