@@ -32,14 +32,13 @@ mod canvas_tests {
     #[test]
     fn constructing_the_ppm_header() {
         let c = Canvas::with_size(5, 3);
-        let ppm_header = c
-            .to_ppm_string()
-            .lines()
-            .take(3)
-            .collect::<Vec<_>>()
-            .join("\n");
+        let ppm_header = c.ppm_header();
 
-        assert_eq!("P3\n5 3\n255", ppm_header)
+        let expected = "\
+            P3\n\
+            5 3\n\
+            255\n";
+        assert_eq!(expected, ppm_header)
     }
 
     #[test]
@@ -53,13 +52,12 @@ mod canvas_tests {
         c.write(2, 1, c2);
         c.write(4, 2, c3);
 
-        let ppm = c.to_ppm_string();
+        let expected = "\
+            255 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n\
+            0 0 0 0 0 0 0 128 0 0 0 0 0 0 0\n\
+            0 0 0 0 0 0 0 0 0 0 0 0 0 0 255\n";
 
-        let expected = "255 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 128 0 0 0 0 0 0 0\n0 0 0 0 \
-        0 0 0 0 0 0 0 0 0 0 255";
-
-        let actual = ppm.lines().skip(3).take(3).collect::<Vec<_>>().join("\n");
-
+        let actual = c.ppm_body();
         assert_eq!(expected, actual);
     }
 
@@ -67,15 +65,13 @@ mod canvas_tests {
     fn splitting_long_lines_in_ppm_files() {
         let c = Canvas::with_size(10, 2).with_default_color((1, 0.8, 0.6).into());
 
-        let ppm_body = c
-            .to_ppm_string()
-            .lines()
-            .skip(3)
-            .take(4)
-            .collect::<Vec<_>>()
-            .join("\n");
-
-        let expected = "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204\n153 255 204 153 255 204 153 255 204 153 255 204 153\n255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204\n153 255 204 153 255 204 153 255 204 153 255 204 153";
+        let ppm_body = c.ppm_body();
+        println!("{}", &c.to_ppm_string());
+        let expected = "\
+            255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204\n\
+            153 255 204 153 255 204 153 255 204 153 255 204 153\n\
+            255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204\n\
+            153 255 204 153 255 204 153 255 204 153 255 204 153\n";
 
         assert_eq!(expected, ppm_body);
     }
@@ -85,7 +81,7 @@ mod canvas_tests {
         let c = Canvas::with_size(10, 2);
 
         let ppm = c.to_ppm_string();
-
+        println!("{}", &ppm);
         assert!(ppm.ends_with('\n'));
     }
 }

@@ -47,7 +47,6 @@ impl Canvas {
         let mut acc = String::new();
 
         for pixel_row in ppm_strings {
-            let mut res = String::new();
             let mut index = 70; // max line length
             let mut chars = pixel_row.join(" ");
 
@@ -56,21 +55,21 @@ impl Canvas {
                 match char {
                     // if it's a blank space already, replace with newline
                     ' ' => chars.replace_range(index..index + 1, "\n"),
-
                     // if not, we find the last blank space from the right.
                     _ => {
-                        if let Some(idx) = chars[index - 70..index].rfind(' ') {
-                            chars.replace_range(idx..idx + 1, "\n")
+                        if let Some(offset) = chars[index - 70..index].rfind(' ') {
+                            let computed_index = index - 70 + offset;
+                            println!("found a space: {computed_index}");
+                            chars.replace_range(computed_index..computed_index + 1, "\n")
                         }
                     }
                 }
                 index += 70;
             }
 
-            res.push_str(chars.as_str());
-            // when the line ends, just add a newline char
-            res += "\n";
-            acc.push_str(&res);
+            chars.push('\n');
+            dbg!(&chars);
+            acc.push_str(&chars);
         }
         acc
     }

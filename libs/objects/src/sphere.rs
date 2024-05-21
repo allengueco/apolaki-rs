@@ -230,7 +230,7 @@ mod sphere_tests {
         let s = Sphere::default();
 
         let normal = s.normal_at(point(n, n, n));
-        
+
         assert_eq!(normal, normal.normalize());
     }
 

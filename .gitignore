@@ -26,3 +26,4 @@ rust-project.json
 .idea
 
 **/*.ppm
+**/*.swp
