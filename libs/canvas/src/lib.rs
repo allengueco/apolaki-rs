@@ -66,7 +66,6 @@ mod canvas_tests {
         let c = Canvas::with_size(10, 2).with_default_color((1, 0.8, 0.6).into());
 
         let ppm_body = c.ppm_body();
-        println!("{}", &c.to_ppm_string());
         let expected = "\
             255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204\n\
             153 255 204 153 255 204 153 255 204 153 255 204 153\n\
@@ -81,7 +80,6 @@ mod canvas_tests {
         let c = Canvas::with_size(10, 2);
 
         let ppm = c.to_ppm_string();
-        println!("{}", &ppm);
         assert!(ppm.ends_with('\n'));
     }
 }

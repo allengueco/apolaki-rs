@@ -14,7 +14,7 @@ pub struct Material {
 impl Material {
     pub fn lighting(
         &self,
-        light: Light,
+        light: &Light,
         point: Tuple,
         eye_vector: Tuple,
         normal_vector: Tuple,
@@ -96,7 +96,7 @@ mod material_tests {
         let normalv = vector(0, 0, -1);
         let light = Light::new(point(0, 0, -10), (1, 1, 1).into());
 
-        let result = test_material().lighting(light, test_position(), eyev, normalv);
+        let result = test_material().lighting(&light, test_position(), eyev, normalv);
 
         assert_eq!(Color::new(1.9, 1.9, 1.9), result)
     }
@@ -107,7 +107,7 @@ mod material_tests {
         let normalv = vector(0, 0, -1);
         let light = Light::new(point(0, 0, -10), (1, 1, 1).into());
 
-        let result = test_material().lighting(light, test_position(), eyev, normalv);
+        let result = test_material().lighting(&light, test_position(), eyev, normalv);
 
         assert_eq!(Color::new(1., 1., 1.), result)
     }
@@ -118,7 +118,7 @@ mod material_tests {
         let normalv = vector(0, 0, -1);
         let light = Light::new(point(0, 10, -10), (1, 1, 1).into());
 
-        let result = test_material().lighting(light, test_position(), eyev, normalv);
+        let result = test_material().lighting(&light, test_position(), eyev, normalv);
 
         assert_eq!(Color::new(0.7364, 0.7364, 0.7364), result)
     }
@@ -129,7 +129,7 @@ mod material_tests {
         let normalv = vector(0, 0, -1);
         let light = Light::new(point(0, 10, -10), (1, 1, 1).into());
 
-        let result = test_material().lighting(light, test_position(), eyev, normalv);
+        let result = test_material().lighting(&light, test_position(), eyev, normalv);
 
         assert_eq!(Color::new(1.6364, 1.6364, 1.6364), result)
     }
@@ -140,7 +140,7 @@ mod material_tests {
         let normalv = vector(0, 0, -1);
         let light = Light::new(point(0, 0, 10), (1, 1, 1).into());
 
-        let result = test_material().lighting(light, test_position(), eyev, normalv);
+        let result = test_material().lighting(&light, test_position(), eyev, normalv);
 
         assert_eq!(Color::new(0.1, 0.1, 0.1), result)
     }

@@ -1,0 +1,10 @@
+[package]
+name = "world"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+apolaki_light = { path = "../../libs/light" }   
+apolaki_objects= { path = "../../libs/objects" }    
+apolaki_color = { path = "../../libs/color" }   
+apolaki_tuple = { path = "../../libs/tuple" }    

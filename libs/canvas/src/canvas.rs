@@ -59,7 +59,6 @@ impl Canvas {
                     _ => {
                         if let Some(offset) = chars[index - 70..index].rfind(' ') {
                             let computed_index = index - 70 + offset;
-                            println!("found a space: {computed_index}");
                             chars.replace_range(computed_index..computed_index + 1, "\n")
                         }
                     }
@@ -68,7 +67,6 @@ impl Canvas {
             }
 
             chars.push('\n');
-            dbg!(&chars);
             acc.push_str(&chars);
         }
         acc
